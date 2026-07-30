@@ -3,10 +3,11 @@
 import { cookies } from "next/headers";
 import { ADMIN_SESSION_COOKIE } from "@/lib/constants";
 import {
-  getAllSurveyResponses,
   getSurveyResponseById,
   getSurveyResponseCount,
+  querySurveyResponses,
 } from "@/services/surveyService";
+import type { SurveyResponseFilters } from "@/types/survey";
 import { responsesToCsv } from "@/utils/csv-export";
 
 const SESSION_MAX_AGE = 60 * 60 * 24; // 24 hours
@@ -55,11 +56,14 @@ export async function fetchAdminStats() {
   return { total };
 }
 
-export async function fetchResponses() {
+export async function fetchResponses(options?: {
+  search?: string;
+  filters?: SurveyResponseFilters;
+}) {
   if (!(await isAdminAuthenticated())) {
     throw new Error("Unauthorized");
   }
-  return getAllSurveyResponses();
+  return querySurveyResponses(options ?? {});
 }
 
 export async function fetchResponseById(id: string) {
@@ -69,10 +73,13 @@ export async function fetchResponseById(id: string) {
   return getSurveyResponseById(id);
 }
 
-export async function exportResponsesCsv(): Promise<string> {
+export async function exportResponsesCsv(options?: {
+  search?: string;
+  filters?: SurveyResponseFilters;
+}): Promise<string> {
   if (!(await isAdminAuthenticated())) {
     throw new Error("Unauthorized");
   }
-  const responses = await getAllSurveyResponses();
+  const responses = await querySurveyResponses(options ?? {});
   return responsesToCsv(responses);
 }

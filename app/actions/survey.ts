@@ -1,25 +1,27 @@
 "use server";
 
-import { surveyFormSchema } from "@/lib/survey-schema";
+import { surveyFormSchema, type SurveyFormValues } from "@/lib/survey-schema";
 import { createSurveyResponse } from "@/services/surveyService";
-import type { SurveyAnswers } from "@/types/survey";
 
 export type SubmitSurveyResult =
   | { success: true; id: string }
   | { success: false; error: string };
 
-/** Submit validated survey answers — wired in Phase 4 */
+/** Submit validated survey answers */
 export async function submitSurvey(
-  answers: SurveyAnswers,
+  answers: SurveyFormValues,
 ): Promise<SubmitSurveyResult> {
   const parsed = surveyFormSchema.safeParse(answers);
 
   if (!parsed.success) {
-    return { success: false, error: "Invalid survey data. Please check your answers." };
+    return {
+      success: false,
+      error: "Invalid survey data. Please check your answers.",
+    };
   }
 
   try {
-    const { id } = await createSurveyResponse(parsed.data as SurveyAnswers);
+    const { id } = await createSurveyResponse(parsed.data);
     return { success: true, id };
   } catch (err) {
     const message =

@@ -1,4 +1,5 @@
-import type { SurveyResponseRecord } from "@/types/survey";
+import { SURVEY_QUESTIONS } from "@/lib/survey-questions";
+import { SURVEY_FIELD_IDS, type SurveyResponseRecord } from "@/types/survey";
 
 /** Escape a value for CSV output */
 function escapeCsvValue(value: string): string {
@@ -8,16 +9,39 @@ function escapeCsvValue(value: string): string {
   return value;
 }
 
-/** Flatten survey responses to CSV — fully implemented in Phase 11 */
+function formatAnswerValue(value: unknown): string {
+  if (Array.isArray(value)) return value.join("; ");
+  if (value === undefined || value === null) return "";
+  return String(value);
+}
+
+/** Column headers: metadata + one column per survey field */
+function getCsvHeaders(): string[] {
+  return ["id", "created_at", ...SURVEY_FIELD_IDS];
+}
+
+/** Flatten survey responses to CSV rows */
 export function responsesToCsv(responses: SurveyResponseRecord[]): string {
+  const headers = getCsvHeaders();
+
   if (responses.length === 0) {
-    return "id,created_at\n";
+    return `${headers.join(",")}\n`;
   }
 
-  const headers = ["id", "created_at"];
-  const rows = responses.map((r) =>
-    [r.id, r.created_at].map(String).map(escapeCsvValue).join(","),
-  );
+  const rows = responses.map((response) => {
+    const cells = [
+      response.id,
+      response.created_at,
+      ...SURVEY_FIELD_IDS.map((fieldId) => {
+        const question = SURVEY_QUESTIONS.find((q) => q.id === fieldId);
+        if (question) {
+          return formatAnswerValue(response.answers[fieldId]);
+        }
+        return formatAnswerValue(response.answers[fieldId]);
+      }),
+    ];
+    return cells.map((cell) => escapeCsvValue(String(cell))).join(",");
+  });
 
   return [headers.join(","), ...rows].join("\n");
 }

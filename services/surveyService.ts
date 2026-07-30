@@ -1,9 +1,13 @@
 import { createServerSupabaseClient } from "@/lib/supabase";
-import type { SurveyAnswers, SurveyResponseRecord } from "@/types/survey";
+import type {
+  SurveyAnswers,
+  SurveyResponseFilters,
+  SurveyResponseRecord,
+} from "@/types/survey";
 
 const TABLE = "survey_responses";
 
-/** Insert a new survey response — implemented in Phase 4 */
+/** Insert a new survey response */
 export async function createSurveyResponse(
   answers: SurveyAnswers,
 ): Promise<{ id: string }> {
@@ -19,7 +23,7 @@ export async function createSurveyResponse(
   return { id: data.id };
 }
 
-/** Fetch all responses for admin dashboard — implemented in Phase 11 */
+/** Fetch all responses, newest first */
 export async function getAllSurveyResponses(): Promise<SurveyResponseRecord[]> {
   const supabase = createServerSupabaseClient();
 
@@ -58,4 +62,62 @@ export async function getSurveyResponseCount(): Promise<number> {
 
   if (error) throw error;
   return count ?? 0;
+}
+
+/** Search responses by matching text inside the JSONB answers payload */
+export async function searchSurveyResponses(
+  query: string,
+): Promise<SurveyResponseRecord[]> {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return getAllSurveyResponses();
+
+  const responses = await getAllSurveyResponses();
+  return responses.filter((response) =>
+    JSON.stringify(response.answers).toLowerCase().includes(normalized),
+  );
+}
+
+/** Filter responses by optional created_at date range (ISO strings) */
+export async function filterSurveyResponses(
+  filters: SurveyResponseFilters,
+): Promise<SurveyResponseRecord[]> {
+  const supabase = createServerSupabaseClient();
+
+  let query = supabase
+    .from(TABLE)
+    .select("id, created_at, answers")
+    .order("created_at", { ascending: false });
+
+  if (filters.from) {
+    query = query.gte("created_at", filters.from);
+  }
+  if (filters.to) {
+    query = query.lte("created_at", filters.to);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data ?? []) as SurveyResponseRecord[];
+}
+
+/** Combined search + date filter for admin dashboard */
+export async function querySurveyResponses(options: {
+  search?: string;
+  filters?: SurveyResponseFilters;
+}): Promise<SurveyResponseRecord[]> {
+  const { search, filters } = options;
+
+  let responses =
+    filters && (filters.from || filters.to)
+      ? await filterSurveyResponses(filters)
+      : await getAllSurveyResponses();
+
+  if (search?.trim()) {
+    const normalized = search.trim().toLowerCase();
+    responses = responses.filter((response) =>
+      JSON.stringify(response.answers).toLowerCase().includes(normalized),
+    );
+  }
+
+  return responses;
 }
