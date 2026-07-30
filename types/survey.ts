@@ -13,6 +13,8 @@ export interface SurveyQuestion {
   options?: readonly string[];
   hasOther?: boolean;
   required?: boolean;
+  maxSelections?: number;
+  maxLength?: number;
   conditionalOn?: {
     questionId: string;
     value: string;
@@ -49,6 +51,7 @@ export interface SurveyResponseFilters {
 export type { SurveyFormValues } from "@/lib/survey-schema";
 
 export const SURVEY_FIELD_IDS = [
+  "respondentName",
   "q1",
   "q1_other",
   "q2",

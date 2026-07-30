@@ -55,8 +55,25 @@ assert(surveyFormSchema.safeParse(validPayload).success, "Valid payload should p
 console.log("4/5 Validating conditional and error rules…");
 assert(!surveyFormSchema.safeParse(defaultSurveyValues).success, "Empty defaults should fail");
 
-const missingFinal = createValidSurveyPayload({ qFinal: "too short" });
+const missingFinal = createValidSurveyPayload({
+  qFinal: "too short",
+});
 assert(!surveyFormSchema.safeParse(missingFinal).success, "Short final answer should fail");
+
+const tooManyQ5 = createValidSurveyPayload({
+  q5: ["Instagram DM", "WhatsApp", "Email"],
+});
+assert(!surveyFormSchema.safeParse(tooManyQ5).success, "Q5 should allow max 2 selections");
+
+const tooManyQ10 = createValidSurveyPayload({
+  q10: ["Package the order", "Print invoice", "Create shipping label", "Send tracking number"],
+});
+assert(!surveyFormSchema.safeParse(tooManyQ10).success, "Q10 should allow max 3 selections");
+
+const tooLongFinal = createValidSurveyPayload({
+  qFinal: "x".repeat(1001),
+});
+assert(!surveyFormSchema.safeParse(tooLongFinal).success, "Final answer should max 1000 chars");
 
 const missingOther = createValidSurveyPayload({
   q1: OTHER_OPTION,

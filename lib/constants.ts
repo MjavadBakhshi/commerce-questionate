@@ -1,7 +1,7 @@
-/** Brand colors from build-prompt.md */
+/** Brand colors */
 export const COLORS = {
-  primary: "#2563EB",
-  background: "#F8FAFC",
+  primary: "#059669",
+  background: "#F4F7F5",
   card: "#FFFFFF",
 } as const;
 

@@ -1,4 +1,5 @@
 import { isQuestionVisible, SURVEY_QUESTIONS } from "@/lib/survey-questions";
+import { FINAL_QUESTION_MIN_LENGTH } from "@/lib/survey-events";
 import { surveyFormSchema } from "@/lib/survey-schema";
 import type { SurveyAnswers } from "@/types/survey";
 import { NUMBERED_QUESTION_COUNT, OTHER_OPTION } from "@/types/survey";
@@ -23,7 +24,7 @@ function isAnswered(
   if (type === "textarea" || type === "radio") {
     if (typeof value !== "string" || value.trim().length === 0) return false;
     if (type === "textarea" && questionId === "qFinal") {
-      return value.trim().length >= 100;
+      return value.trim().length >= FINAL_QUESTION_MIN_LENGTH;
     }
     return true;
   }

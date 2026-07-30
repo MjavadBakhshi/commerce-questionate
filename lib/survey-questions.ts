@@ -103,8 +103,10 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     id: "q5",
     number: 5,
     sectionId: "order-workflow",
-    type: "radio",
+    type: "checkbox",
     label: "Where do most of your customers first contact you?",
+    description: "Select up to 2 options",
+    maxSelections: 2,
     options: [
       "Instagram DM",
       "WhatsApp",
@@ -168,8 +170,10 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     id: "q9",
     number: 9,
     sectionId: "order-workflow",
-    type: "radio",
+    type: "checkbox",
     label: "How do you confirm customer payments?",
+    description: "Select up to 2 options",
+    maxSelections: 2,
     options: [
       "Bank transfer verification",
       "Payment gateway",
@@ -186,6 +190,8 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     sectionId: "order-workflow",
     type: "checkbox",
     label: "What happens after payment is confirmed?",
+    description: "Select up to 3 steps you usually take",
+    maxSelections: 3,
     options: [
       "Package the order",
       "Print invoice",
@@ -239,6 +245,8 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     sectionId: "challenges",
     type: "checkbox",
     label: "Which tasks consume the most time?",
+    description: "Select up to 3 that take the most time in your week",
+    maxSelections: 3,
     options: [
       "Replying to customers",
       "Creating orders",
@@ -329,6 +337,7 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     description:
       "Start from the moment the customer contacted you until the order was shipped.",
     minLength: 100,
+    maxLength: 1000,
   }),
 ];
 

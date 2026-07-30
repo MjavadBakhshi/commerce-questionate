@@ -49,25 +49,25 @@
 }
 
 :root {
-  /* Brand palette from build-prompt.md */
-  --background: #f8fafc;
+  /* Trustworthy emerald palette inspired by modern survey UX */
+  --background: #f4f7f5;
   --foreground: #0f172a;
   --card: #ffffff;
   --card-foreground: #0f172a;
   --popover: #ffffff;
   --popover-foreground: #0f172a;
-  --primary: #2563eb;
+  --primary: #059669;
   --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
+  --secondary: #ecfdf5;
+  --secondary-foreground: #065f46;
+  --muted: #eef2f0;
   --muted-foreground: #64748b;
-  --accent: #eff6ff;
-  --accent-foreground: #1d4ed8;
+  --accent: #ecfdf5;
+  --accent-foreground: #047857;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #2563eb;
+  --border: #dbe4de;
+  --input: #dbe4de;
+  --ring: #059669;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -127,6 +127,11 @@
   }
   html {
     @apply font-sans scroll-smooth;
+    overflow-anchor: none;
+  }
+
+  main {
+    overflow-anchor: none;
   }
 }
 

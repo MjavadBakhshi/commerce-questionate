@@ -45,7 +45,10 @@ export async function verifyAdminPassword(
 
 export async function logoutAdmin(): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.delete(ADMIN_SESSION_COOKIE);
+  cookieStore.delete({
+    name: ADMIN_SESSION_COOKIE,
+    path: "/admin",
+  });
 }
 
 export async function fetchAdminStats() {

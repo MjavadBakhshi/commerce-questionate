@@ -1,32 +1,41 @@
 import { useCallback, useEffect, useRef } from "react";
-import type { UseFormWatch } from "react-hook-form";
+import type { UseFormGetValues, UseFormWatch } from "react-hook-form";
 import { saveSurveyDraft } from "@/utils/local-storage";
-import type { SurveyAnswers } from "@/types/survey";
+import type { SurveyFormValues } from "@/lib/survey-schema";
 
-const DEBOUNCE_MS = 400;
-
-/** Auto-save form values to LocalStorage — implemented in Phase 8 */
-export function useSurveyAutosave(watch: UseFormWatch<SurveyAnswers>) {
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const persist = useCallback((values: SurveyAnswers) => {
+/** Auto-save form values to LocalStorage on every change */
+export function useSurveyAutosave(
+  watch: UseFormWatch<SurveyFormValues>,
+  getValues: UseFormGetValues<SurveyFormValues>,
+) {
+  const persist = useCallback((values: SurveyFormValues) => {
     saveSurveyDraft({
       answers: values,
       savedAt: new Date().toISOString(),
     });
   }, []);
 
+  const persistRef = useRef(persist);
+  persistRef.current = persist;
+
+  useEffect(() => {
+    persistRef.current(getValues());
+  }, [getValues]);
+
   useEffect(() => {
     const subscription = watch((values) => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => {
-        persist(values as SurveyAnswers);
-      }, DEBOUNCE_MS);
+      persistRef.current(values as SurveyFormValues);
     });
 
-    return () => {
-      subscription.unsubscribe();
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [watch, persist]);
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
+  useEffect(() => {
+    function handleBeforeUnload() {
+      persistRef.current(getValues());
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [getValues]);
 }
