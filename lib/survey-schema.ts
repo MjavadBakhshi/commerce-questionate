@@ -1,6 +1,6 @@
 import { z } from "zod";
+import { SURVEY_QUESTIONS } from "@/lib/survey-questions";
 import { OTHER_OPTION } from "@/types/survey";
-import type { SurveyFormValues } from "@/types/survey";
 
 const selectMessage = "Please select an option";
 const describeMessage = "Please describe your answer";
@@ -10,7 +10,7 @@ const finalQuestionMessage = "Please write at least 100 characters";
 const stringArray = z.array(z.string());
 
 /** Base object schema — conditional rules applied in superRefine */
-const baseSurveySchema = z.object({
+export const baseSurveySchema = z.object({
   q1: z.string().min(1, selectMessage),
   q1_other: z.string().optional(),
   q2: z.string().min(1, selectMessage),
@@ -46,29 +46,24 @@ const baseSurveySchema = z.object({
   qFinal: z.string().min(100, finalQuestionMessage),
 });
 
-type OtherRule =
-  | { kind: "radio"; field: keyof SurveyFormValues; other: keyof SurveyFormValues }
-  | { kind: "checkbox"; field: keyof SurveyFormValues; other: keyof SurveyFormValues };
+export type SurveyFormValues = z.infer<typeof baseSurveySchema>;
 
-const otherRules: OtherRule[] = [
-  { kind: "radio", field: "q1", other: "q1_other" },
-  { kind: "checkbox", field: "q4", other: "q4_other" },
-  { kind: "radio", field: "q5", other: "q5_other" },
-  { kind: "radio", field: "q6", other: "q6_other" },
-  { kind: "radio", field: "q7", other: "q7_other" },
-  { kind: "radio", field: "q8", other: "q8_other" },
-  { kind: "radio", field: "q9", other: "q9_other" },
-  { kind: "checkbox", field: "q10", other: "q10_other" },
-  { kind: "checkbox", field: "q11", other: "q11_other" },
-  { kind: "checkbox", field: "q14", other: "q14_other" },
-  { kind: "checkbox", field: "q15", other: "q15_other" },
-  { kind: "radio", field: "q16", other: "q16_other" },
-];
+type OtherRule = {
+  kind: "radio" | "checkbox";
+  field: keyof SurveyFormValues;
+  other: keyof SurveyFormValues;
+};
 
-function requiresOtherValue(
-  rule: OtherRule,
-  data: SurveyFormValues,
-): boolean {
+/** Built from question definitions — keeps validation in sync with the form */
+const otherRules: OtherRule[] = SURVEY_QUESTIONS.filter((question) => question.hasOther).map(
+  (question) => ({
+    kind: question.type === "checkbox" ? "checkbox" : "radio",
+    field: question.id as keyof SurveyFormValues,
+    other: `${question.id}_other` as keyof SurveyFormValues,
+  }),
+);
+
+function requiresOtherValue(rule: OtherRule, data: SurveyFormValues): boolean {
   const value = data[rule.field];
   if (rule.kind === "radio") {
     return value === OTHER_OPTION;
@@ -78,9 +73,9 @@ function requiresOtherValue(
 
 export const surveyFormSchema = baseSurveySchema.superRefine((data, ctx) => {
   for (const rule of otherRules) {
-    if (!requiresOtherValue(rule, data as SurveyFormValues)) continue;
+    if (!requiresOtherValue(rule, data)) continue;
 
-    const otherValue = data[rule.other as keyof typeof data];
+    const otherValue = data[rule.other];
     if (typeof otherValue !== "string" || otherValue.trim().length === 0) {
       ctx.addIssue({
         code: "custom",
@@ -101,8 +96,6 @@ export const surveyFormSchema = baseSurveySchema.superRefine((data, ctx) => {
   }
 });
 
-export type { SurveyFormValues };
-
 export const defaultSurveyValues: SurveyFormValues = {
   q1: "",
   q2: "",
@@ -120,8 +113,38 @@ export const defaultSurveyValues: SurveyFormValues = {
   q14: [],
   q15: [],
   q16: "",
-  q17: "",
+  q17: "No",
   q19: "",
   q20: "",
   qFinal: "",
 };
+
+/** Complete valid payload used by tests and Storybook-style previews */
+export function createValidSurveyPayload(
+  overrides: Partial<SurveyFormValues> = {},
+): SurveyFormValues {
+  return {
+    q1: "Fashion & Clothing",
+    q2: "5–20",
+    q3: "Just me",
+    q4: ["Instagram", "WhatsApp"],
+    q5: "Instagram DM",
+    q6: "Check inventory",
+    q7: "Excel / Google Sheets",
+    q8: "Spreadsheet",
+    q9: "Bank transfer verification",
+    q10: ["Package the order", "Update inventory"],
+    q11: ["Instagram", "WhatsApp", "Google Sheets"],
+    q12: "10–30",
+    q13: "5–10",
+    q14: ["Replying to customers", "Creating orders"],
+    q15: ["Late shipping"],
+    q16: "Creating orders",
+    q17: "No",
+    q19: "Too manual and disconnected from social channels.",
+    q20: "$10–30",
+    qFinal:
+      "A customer DM'd on Instagram asking about a blue hoodie in size M. I confirmed stock in my spreadsheet, sent payment details via WhatsApp, verified the bank transfer, packed the order, and shipped it with tracking shared the same day.",
+    ...overrides,
+  };
+}
