@@ -28,10 +28,13 @@ Row Level Security is enabled. There are **no public policies** — all reads an
 
 In **Project Settings → API**, copy:
 
-- **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
-- **anon public** key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- **service_role** key → `SUPABASE_SERVICE_ROLE_KEY`
+| Supabase dashboard | `.env.local` variable |
+|------------------|----------------------|
+| **Project URL** | `NEXT_PUBLIC_SUPABASE_URL` |
+| **Publishable key** (or **Anonymous API key** legacy) | `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+| **Secret key** (or **Service API key** legacy) | `SUPABASE_SERVICE_ROLE_KEY` |
 
+> Use the **legacy** keys if the new publishable/secret keys do not work with your SDK version.  
 > Never expose `SUPABASE_SERVICE_ROLE_KEY` to the browser or commit it to git.
 
 ## 4. Configure environment variables
