@@ -1,36 +1,124 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Questionate
+
+A production-ready research survey for online shop owners. Collects workflow insights via a beautiful landing page questionnaire and stores responses in Supabase.
+
+## Tech Stack
+
+- **Next.js 16** (App Router)
+- **React 19** + **TypeScript**
+- **Tailwind CSS** + **shadcn/ui**
+- **React Hook Form** + **Zod**
+- **Supabase** (PostgreSQL + JSONB)
+- **Vercel** (deployment target)
+
+## Features
+
+- Premium mobile-first survey landing page
+- 20 structured questions + final open-ended response
+- Auto-save to LocalStorage (resume after refresh)
+- Respondent name capture (+ URL prefill via `?name=`)
+- Password-protected admin dashboard at `/admin`
+- Search, date filters, detail view, CSV export
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure Supabase
+
+Follow [docs/supabase-setup.md](docs/supabase-setup.md):
+
+1. Create a Supabase project
+2. Run the SQL migration in `supabase/migrations/001_create_survey_responses.sql`
+3. Copy your API keys
+
+### 3. Environment variables
+
+```bash
+cp .env.local.example .env.local
+```
+
+Fill in `.env.local`:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-or-publishable-key
+SUPABASE_SERVICE_ROLE_KEY=your-secret-or-service-role-key
+ADMIN_PASSWORD=choose-a-strong-password
+```
+
+Optional:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+```
+
+### 4. Run locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 5. Verify setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run test:supabase   # DB connection + table access
+npm run test:phase3     # Survey schema + question definitions
+npm run build           # Production build
+```
 
-## Learn More
+## Admin Dashboard
 
-To learn more about Next.js, take a look at the following resources:
+1. Visit [http://localhost:3000/admin](http://localhost:3000/admin)
+2. Sign in with your `ADMIN_PASSWORD`
+3. View responses, search, filter by date, export CSV (`survey-responses.csv`)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Survey URL Parameters
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Pre-fill the respondent name:
 
-## Deploy on Vercel
+```
+https://your-domain.com/?name=Sara%27s%20Boutique
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Also supports `?user=` and `?username=`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy to Vercel
+
+1. Push the repository to GitHub
+2. Import the project in [Vercel](https://vercel.com/new)
+3. Add all environment variables from `.env.local.example`
+4. Deploy
+
+## Project Structure
+
+```text
+app/                  # Routes, layouts, server actions
+components/           # UI, survey, admin, landing
+hooks/                # Auto-save, progress
+lib/                  # Schema, questions, Supabase client
+services/             # Database service layer
+supabase/migrations/  # SQL migrations
+types/                # TypeScript interfaces
+utils/                # CSV export, localStorage
+```
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run test:supabase` | Test Supabase connection |
+| `npm run test:phase3` | Test survey data layer |
+
+## License
+
+Private — all rights reserved.

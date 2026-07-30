@@ -15,12 +15,20 @@ export const metadata: Metadata = {
   description:
     "Help us understand the biggest challenges online business owners face so we can build better software.",
   metadataBase: new URL(siteUrl),
+  keywords: [
+    "online store survey",
+    "e-commerce research",
+    "shop owner questionnaire",
+    "commerce management",
+  ],
+  authors: [{ name: "Questionate" }],
   openGraph: {
     title: "Online Store Owner Research Survey",
     description:
       "Help us understand the biggest challenges online business owners face so we can build better software.",
     type: "website",
     siteName: "Questionate",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
@@ -28,6 +36,14 @@ export const metadata: Metadata = {
     description:
       "Help us understand the biggest challenges online business owners face so we can build better software.",
   },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+export const viewport = {
+  themeColor: "#059669",
 };
 
 export default function RootLayout({
