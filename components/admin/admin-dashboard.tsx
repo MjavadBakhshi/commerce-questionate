@@ -1,15 +1,15 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useMemo, useState } from "react";
 import { LogOut, Search } from "lucide-react";
-import { logoutAdmin } from "@/app/admin/actions";
 import { ExportButton } from "@/components/admin/export-button";
 import { ResponseDetail } from "@/components/admin/response-detail";
 import { ResponseList } from "@/components/admin/response-list";
 import { StatsCards } from "@/components/admin/stats-cards";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import type { SurveyResponseRecord } from "@/types/survey";
 
 interface AdminDashboardProps {
@@ -24,7 +24,6 @@ export function AdminDashboard({ initialResponses, total }: AdminDashboardProps)
   const [selectedResponse, setSelectedResponse] = useState<SurveyResponseRecord | null>(
     null,
   );
-  const [isLoggingOut, startLogout] = useTransition();
 
   const filteredResponses = useMemo(() => {
     let results = initialResponses;
@@ -49,13 +48,6 @@ export function AdminDashboard({ initialResponses, total }: AdminDashboardProps)
     return results;
   }, [initialResponses, search, fromDate, toDate]);
 
-  function handleLogout() {
-    startLogout(async () => {
-      await logoutAdmin();
-      window.location.reload();
-    });
-  }
-
   return (
     <div className="space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -67,10 +59,13 @@ export function AdminDashboard({ initialResponses, total }: AdminDashboardProps)
         </div>
         <div className="flex flex-wrap gap-2">
           <ExportButton search={search} fromDate={fromDate} toDate={toDate} />
-          <Button variant="outline" onClick={handleLogout} disabled={isLoggingOut}>
+          <a
+            href="/admin/logout"
+            className={cn(buttonVariants({ variant: "outline" }))}
+          >
             <LogOut className="size-4" />
-            {isLoggingOut ? "Signing out…" : "Sign out"}
-          </Button>
+            Sign out
+          </a>
         </div>
       </div>
 

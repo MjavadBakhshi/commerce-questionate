@@ -1,7 +1,10 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { ADMIN_SESSION_COOKIE } from "@/lib/constants";
+import {
+  ADMIN_LOGOUT_COOKIE,
+  ADMIN_SESSION_COOKIE,
+} from "@/lib/admin-session";
 import {
   getSurveyResponseById,
   getSurveyResponseCount,
@@ -10,45 +13,11 @@ import {
 import type { SurveyResponseFilters } from "@/types/survey";
 import { responsesToCsv } from "@/utils/csv-export";
 
-const SESSION_MAX_AGE = 60 * 60 * 24; // 24 hours
-
 async function isAdminAuthenticated(): Promise<boolean> {
   const cookieStore = await cookies();
   const session = cookieStore.get(ADMIN_SESSION_COOKIE);
-  return session?.value === "authenticated";
-}
-
-export async function verifyAdminPassword(
-  password: string,
-): Promise<{ success: boolean }> {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-
-  if (!adminPassword) {
-    return { success: false };
-  }
-
-  if (password !== adminPassword) {
-    return { success: false };
-  }
-
-  const cookieStore = await cookies();
-  cookieStore.set(ADMIN_SESSION_COOKIE, "authenticated", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: SESSION_MAX_AGE,
-    path: "/admin",
-  });
-
-  return { success: true };
-}
-
-export async function logoutAdmin(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.delete({
-    name: ADMIN_SESSION_COOKIE,
-    path: "/admin",
-  });
+  const loggedOut = cookieStore.get(ADMIN_LOGOUT_COOKIE);
+  return session?.value === "authenticated" && loggedOut?.value !== "1";
 }
 
 export async function fetchAdminStats() {

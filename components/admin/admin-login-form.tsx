@@ -1,31 +1,14 @@
-"use client";
-
-import { useState, useTransition } from "react";
+import { loginAdminFormAction } from "@/app/admin/login/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { verifyAdminPassword } from "@/app/admin/actions";
 
-export function AdminLoginForm() {
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+interface AdminLoginFormProps {
+  error?: string;
+}
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-
-    startTransition(async () => {
-      const result = await verifyAdminPassword(password);
-      if (!result.success) {
-        setError("Invalid password. Please try again.");
-        return;
-      }
-      window.location.reload();
-    });
-  }
-
+export function AdminLoginForm({ error }: AdminLoginFormProps) {
   return (
     <Card className="w-full max-w-md border-0 shadow-lg">
       <CardHeader>
@@ -33,14 +16,13 @@ export function AdminLoginForm() {
         <CardDescription>Enter the admin password to view survey responses.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form action={loginAdminFormAction} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="admin-password">Password</Label>
             <Input
               id="admin-password"
+              name="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
               required
             />
@@ -50,8 +32,8 @@ export function AdminLoginForm() {
               {error}
             </p>
           )}
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Signing in…" : "Sign in"}
+          <Button type="submit" className="w-full">
+            Sign in
           </Button>
         </form>
       </CardContent>

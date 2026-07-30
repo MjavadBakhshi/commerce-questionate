@@ -1,9 +1,15 @@
 import { cookies } from "next/headers";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { AdminDashboard } from "@/components/admin/admin-dashboard";
-import { AdminLoginForm } from "@/components/admin/admin-login-form";
-import { ADMIN_SESSION_COOKIE } from "@/lib/constants";
-import { fetchAdminStats, fetchResponses } from "@/app/admin/actions";
+import {
+  ADMIN_LOGOUT_COOKIE,
+  ADMIN_SESSION_COOKIE,
+} from "@/lib/admin-session";
+import {
+  getAllSurveyResponses,
+  getSurveyResponseCount,
+} from "@/services/surveyService";
 import type { SurveyResponseRecord } from "@/types/survey";
 
 export const metadata: Metadata = {
@@ -11,17 +17,16 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminPage() {
   const cookieStore = await cookies();
   const isAuthenticated =
-    cookieStore.get(ADMIN_SESSION_COOKIE)?.value === "authenticated";
+    cookieStore.get(ADMIN_SESSION_COOKIE)?.value === "authenticated" &&
+    cookieStore.get(ADMIN_LOGOUT_COOKIE)?.value !== "1";
 
   if (!isAuthenticated) {
-    return (
-      <main className="flex flex-1 items-center justify-center px-4 py-20">
-        <AdminLoginForm />
-      </main>
-    );
+    redirect("/admin/login");
   }
 
   let responses: SurveyResponseRecord[] = [];
@@ -29,9 +34,10 @@ export default async function AdminPage() {
   let loadError: string | null = null;
 
   try {
-    const [stats, data] = await Promise.all([fetchAdminStats(), fetchResponses()]);
-    total = stats.total;
-    responses = data;
+    [total, responses] = await Promise.all([
+      getSurveyResponseCount(),
+      getAllSurveyResponses(),
+    ]);
   } catch (err) {
     loadError =
       err instanceof Error
