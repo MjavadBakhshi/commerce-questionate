@@ -77,11 +77,11 @@ export function getInitialSurveyValues(): SurveyFormValues {
   return mergeDraftWithDefaults(loadSurveyDraft());
 }
 
-/** Read ?name=, ?user=, or ?username= from the page URL */
+/** Read Instagram username prefill params from the page URL */
 export function getRespondentNameFromUrl(): string {
   if (!isBrowser()) return "";
   const params = new URLSearchParams(window.location.search);
-  for (const key of ["name", "user", "username"]) {
+  for (const key of ["instagram", "username", "user", "name"]) {
     const value = params.get(key)?.trim();
     if (value) return value;
   }

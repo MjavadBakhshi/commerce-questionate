@@ -7,5 +7,10 @@ export const FINAL_QUESTION_MIN_LENGTH = 100;
 /** Maximum character count for the final open-ended question */
 export const FINAL_QUESTION_MAX_LENGTH = 1000;
 
-/** URL search params checked for a pre-filled respondent name */
-export const RESPONDENT_NAME_PARAMS = ["name", "user", "username"] as const;
+/** URL search params checked for a pre-filled Instagram username */
+export const RESPONDENT_NAME_PARAMS = [
+  "instagram",
+  "username",
+  "user",
+  "name",
+] as const;

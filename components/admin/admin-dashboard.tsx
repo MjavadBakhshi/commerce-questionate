@@ -80,7 +80,7 @@ export function AdminDashboard({ initialResponses, total }: AdminDashboardProps)
               id="admin-search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by name, answers, or keywords…"
+              placeholder="Search by Instagram username, answers, or keywords…"
               className="pl-9"
             />
           </div>

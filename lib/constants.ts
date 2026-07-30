@@ -10,13 +10,13 @@ export const COPY = {
   hero: {
     title: "Help Us Build the Best Commerce Management Platform",
     subtitle:
-      "This survey takes less than 5 minutes to complete. Your feedback will directly influence the features we build for online businesses.",
+      "This survey takes less than 5 minutes. Share your workflow and enter your exact Instagram username so we can reach you for early access.",
     cta: "Start Survey",
   },
   success: {
     title: "Thank you for taking the time to complete our survey!",
     description:
-      "Your feedback has been successfully recorded and will help us build better tools for online businesses.",
+      "Your feedback has been recorded. If you shared your Instagram username, we'll contact you there when early access opens.",
   },
   restore: {
     title: "Continue your survey?",

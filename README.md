@@ -16,7 +16,7 @@ A production-ready research survey for online shop owners. Collects workflow ins
 - Premium mobile-first survey landing page
 - 20 structured questions + final open-ended response
 - Auto-save to LocalStorage (resume after refresh)
-- Respondent name capture (+ URL prefill via `?name=`)
+- Instagram username capture for early access (+ URL prefill via `?instagram=`)
 - Password-protected admin dashboard at `/admin`
 - Search, date filters, detail view, CSV export
 
@@ -81,13 +81,13 @@ npm run build           # Production build
 
 ## Survey URL Parameters
 
-Pre-fill the respondent name:
+Pre-fill the Instagram username:
 
 ```
-https://your-domain.com/?name=Sara%27s%20Boutique
+https://your-domain.com/?instagram=sarasboutique
 ```
 
-Also supports `?user=` and `?username=`.
+Also supports `?username=`, `?user=`, and `?name=`.
 
 ## Deploy to Vercel
 

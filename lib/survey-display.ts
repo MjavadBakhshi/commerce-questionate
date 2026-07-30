@@ -7,7 +7,7 @@ const QUESTION_LABELS = Object.fromEntries(
 
 /** Human-readable label for a stored answer field */
 export function getAnswerFieldLabel(fieldId: string): string {
-  if (fieldId === "respondentName") return "Respondent";
+  if (fieldId === "respondentName") return "Instagram username";
   if (fieldId.endsWith("_other")) {
     const baseId = fieldId.replace(/_other$/, "");
     const baseLabel = QUESTION_LABELS[baseId] ?? baseId;

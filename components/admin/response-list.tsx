@@ -29,7 +29,7 @@ export function ResponseList({ responses, onSelect }: ResponseListProps) {
           <thead className="border-b bg-muted/40">
             <tr>
               <th className="px-4 py-3 font-medium text-muted-foreground">Submitted</th>
-              <th className="px-4 py-3 font-medium text-muted-foreground">Respondent</th>
+              <th className="px-4 py-3 font-medium text-muted-foreground">Instagram</th>
               <th className="px-4 py-3 font-medium text-muted-foreground">Preview</th>
               <th className="px-4 py-3 font-medium text-muted-foreground">Actions</th>
             </tr>

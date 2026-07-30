@@ -118,10 +118,11 @@ export function SurveyForm() {
         >
           <div className="rounded-xl border-2 border-primary/15 bg-accent/20 p-5">
             <Label htmlFor="respondentName" className="text-base font-semibold">
-              Your name or business name
+              Your exact Instagram username
             </Label>
             <p className="mt-1 mb-3 text-sm text-muted-foreground">
-              So we know who shared their experience with us.
+              Enter your exact Instagram handle so we can contact you for future early access.
+              Do not include spaces — use the username exactly as it appears on Instagram.
             </p>
             <Controller
               name="respondentName"
@@ -131,7 +132,7 @@ export function SurveyForm() {
                   <Input
                     {...field}
                     id="respondentName"
-                    placeholder="e.g. Sara's Boutique"
+                    placeholder="e.g. @sarasboutique"
                     className="h-12 rounded-xl border-2 bg-card text-base"
                     aria-invalid={!!fieldState.error}
                     aria-describedby={

@@ -9,17 +9,34 @@ import { OTHER_OPTION } from "@/types/survey";
 const selectMessage = "Please select an option";
 const describeMessage = "Please describe your answer";
 const requiredTextMessage = "This field is required";
-const nameMessage = "Please enter your name or business name";
+const instagramUsernameMessage = "Please enter your exact Instagram username";
+const invalidInstagramUsernameMessage =
+  "Enter your exact Instagram username (letters, numbers, . and _ only)";
 const finalQuestionMinMessage = `Please write at least ${FINAL_QUESTION_MIN_LENGTH} characters`;
 const finalQuestionMaxMessage = `Please keep your answer under ${FINAL_QUESTION_MAX_LENGTH} characters`;
 const maxTwoMessage = "Please select no more than 2 options";
 const maxThreeMessage = "Please select no more than 3 options";
 
+function isValidInstagramUsername(value: string): boolean {
+  const username = value.trim().replace(/^@/, "");
+  return (
+    username.length >= 1 &&
+    username.length <= 30 &&
+    /^[a-zA-Z0-9._]+$/.test(username)
+  );
+}
+
 const stringArray = z.array(z.string());
 
 /** Base object schema — conditional rules applied in superRefine */
 export const baseSurveySchema = z.object({
-  respondentName: z.string().trim().min(1, nameMessage),
+  respondentName: z
+    .string()
+    .trim()
+    .min(1, instagramUsernameMessage)
+    .refine(isValidInstagramUsername, {
+      message: invalidInstagramUsernameMessage,
+    }),
   q1: z.string().min(1, selectMessage),
   q1_other: z.string().optional(),
   q2: z.string().min(1, selectMessage),
@@ -140,7 +157,7 @@ export function createValidSurveyPayload(
   overrides: Partial<SurveyFormValues> = {},
 ): SurveyFormValues {
   return {
-    respondentName: "Alex Morgan",
+    respondentName: "sarasboutique",
     q1: "Fashion & Clothing",
     q2: "5–20",
     q3: "Just me",
