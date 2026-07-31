@@ -9,7 +9,9 @@
     "lint": "eslint",
     "test:supabase": "node scripts/test-supabase.mjs",
     "test:phase3": "npx tsx scripts/test-phase3.ts",
-    "test:locales": "npx tsx scripts/test-locale-registry.ts"
+    "test:locales": "npx tsx scripts/test-locale-registry.ts",
+    "test:scenarios": "npx tsx scripts/test-survey-scenarios.ts",
+    "test": "npm run test:locales && npm run test:phase3 && npm run test:scenarios"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

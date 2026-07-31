@@ -1,12 +1,13 @@
-import { FINAL_QUESTION_MIN_LENGTH } from "@/lib/survey-events";
 import {
   DEFAULT_SURVEY_LOCALE,
   getSurveyDraftKey,
+  getSurveyLocaleConfig,
   LEGACY_SURVEY_DRAFT_KEY,
   type SurveyLocale,
 } from "@/lib/survey";
+import { FINAL_QUESTION_MIN_LENGTH } from "@/lib/survey-events";
 import type { SurveyDraft } from "@/types/survey";
-import { defaultSurveyValues, type SurveyFormValues } from "@/lib/survey-schema";
+import type { SurveyFormValues } from "@/types/survey";
 
 function isBrowser(): boolean {
   return typeof window !== "undefined";
@@ -25,25 +26,27 @@ function toStringArray(value: unknown, fallback: string[] = []): string[] {
 
 export function mergeDraftWithDefaults(
   draft: SurveyDraft | null,
+  locale: SurveyLocale = DEFAULT_SURVEY_LOCALE,
 ): SurveyFormValues {
-  if (!draft?.answers) return { ...defaultSurveyValues };
+  const { defaultValues } = getSurveyLocaleConfig(locale);
+  if (!draft?.answers) return { ...defaultValues };
 
   const answers = draft.answers;
 
   return {
-    ...defaultSurveyValues,
+    ...defaultValues,
     ...answers,
     respondentName:
       typeof answers.respondentName === "string"
         ? answers.respondentName
-        : defaultSurveyValues.respondentName,
-    q4: toStringArray(answers.q4, defaultSurveyValues.q4),
-    q5: toStringArray(answers.q5, defaultSurveyValues.q5),
-    q9: toStringArray(answers.q9, defaultSurveyValues.q9),
-    q10: toStringArray(answers.q10, defaultSurveyValues.q10),
-    q11: toStringArray(answers.q11, defaultSurveyValues.q11),
-    q14: toStringArray(answers.q14, defaultSurveyValues.q14),
-    q15: toStringArray(answers.q15, defaultSurveyValues.q15),
+        : defaultValues.respondentName,
+    q4: toStringArray(answers.q4, defaultValues.q4 as string[]),
+    q5: toStringArray(answers.q5, defaultValues.q5 as string[]),
+    q9: toStringArray(answers.q9, defaultValues.q9 as string[]),
+    q10: toStringArray(answers.q10, defaultValues.q10 as string[]),
+    q11: toStringArray(answers.q11, defaultValues.q11 as string[]),
+    q14: toStringArray(answers.q14, defaultValues.q14 as string[]),
+    q15: toStringArray(answers.q15, defaultValues.q15 as string[]),
   } as SurveyFormValues;
 }
 
@@ -85,8 +88,15 @@ export function hasSurveyDraft(locale: SurveyLocale = DEFAULT_SURVEY_LOCALE): bo
   const draft = loadSurveyDraft(locale);
   if (!draft?.answers) return false;
 
+  const { questions } = getSurveyLocaleConfig(locale);
+  const q18 = questions.find((question) => question.id === "q18");
+  const q17Yes = q18?.conditionalOn?.value;
+  const q17No = questions
+    .find((question) => question.id === "q17")
+    ?.options?.find((option) => option !== q17Yes);
+
   return Object.entries(draft.answers).some(([key, value]) => {
-    if (key === "q17" && value === "No") return false;
+    if (key === "q17" && value === q17No) return false;
     if (Array.isArray(value)) return value.length > 0;
     if (typeof value === "string") return value.trim().length > 0;
     return false;
@@ -96,7 +106,7 @@ export function hasSurveyDraft(locale: SurveyLocale = DEFAULT_SURVEY_LOCALE): bo
 export function getInitialSurveyValues(
   locale: SurveyLocale = DEFAULT_SURVEY_LOCALE,
 ): SurveyFormValues {
-  return mergeDraftWithDefaults(loadSurveyDraft(locale));
+  return mergeDraftWithDefaults(loadSurveyDraft(locale), locale);
 }
 
 /** Read Instagram username prefill params from the page URL */

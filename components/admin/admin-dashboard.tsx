@@ -9,24 +9,33 @@ import { StatsCards } from "@/components/admin/stats-cards";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SURVEY_LOCALE_LABELS } from "@/lib/survey";
 import { cn } from "@/lib/utils";
-import type { SurveyResponseRecord } from "@/types/survey";
+import type { SurveyLocaleFilter, SurveyResponseRecord } from "@/types/survey";
 
 interface AdminDashboardProps {
   initialResponses: SurveyResponseRecord[];
   total: number;
 }
 
+const selectClassName =
+  "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30";
+
 export function AdminDashboard({ initialResponses, total }: AdminDashboardProps) {
   const [search, setSearch] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [localeFilter, setLocaleFilter] = useState<SurveyLocaleFilter>("all");
   const [selectedResponse, setSelectedResponse] = useState<SurveyResponseRecord | null>(
     null,
   );
 
   const filteredResponses = useMemo(() => {
     let results = initialResponses;
+
+    if (localeFilter !== "all") {
+      results = results.filter((response) => response.locale === localeFilter);
+    }
 
     if (fromDate) {
       const from = new Date(fromDate);
@@ -46,7 +55,7 @@ export function AdminDashboard({ initialResponses, total }: AdminDashboardProps)
     }
 
     return results;
-  }, [initialResponses, search, fromDate, toDate]);
+  }, [initialResponses, search, fromDate, toDate, localeFilter]);
 
   return (
     <div className="space-y-8">
@@ -58,7 +67,12 @@ export function AdminDashboard({ initialResponses, total }: AdminDashboardProps)
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <ExportButton search={search} fromDate={fromDate} toDate={toDate} />
+          <ExportButton
+            search={search}
+            fromDate={fromDate}
+            toDate={toDate}
+            locale={localeFilter}
+          />
           <a
             href="/admin/logout"
             className={cn(buttonVariants({ variant: "outline" }))}
@@ -71,8 +85,8 @@ export function AdminDashboard({ initialResponses, total }: AdminDashboardProps)
 
       <StatsCards total={total} filtered={filteredResponses.length} />
 
-      <div className="grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-[1fr_auto_auto] sm:items-end">
-        <div className="space-y-2">
+      <div className="grid gap-4 rounded-xl border bg-card p-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-end">
+        <div className="space-y-2 sm:col-span-2 lg:col-span-1">
           <Label htmlFor="admin-search">Search</Label>
           <div className="relative">
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -84,6 +98,21 @@ export function AdminDashboard({ initialResponses, total }: AdminDashboardProps)
               className="pl-9"
             />
           </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="admin-locale">Language</Label>
+          <select
+            id="admin-locale"
+            value={localeFilter}
+            onChange={(event) =>
+              setLocaleFilter(event.target.value as SurveyLocaleFilter)
+            }
+            className={selectClassName}
+          >
+            <option value="all">All languages</option>
+            <option value="en">{SURVEY_LOCALE_LABELS.en}</option>
+            <option value="fa">{SURVEY_LOCALE_LABELS.fa}</option>
+          </select>
         </div>
         <div className="space-y-2">
           <Label htmlFor="admin-from">From</Label>

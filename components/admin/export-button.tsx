@@ -5,13 +5,16 @@ import { Download } from "lucide-react";
 import { exportResponsesCsv } from "@/app/admin/actions";
 import { Button } from "@/components/ui/button";
 
+import type { SurveyLocaleFilter } from "@/types/survey";
+
 interface ExportButtonProps {
   search?: string;
   fromDate?: string;
   toDate?: string;
+  locale?: SurveyLocaleFilter;
 }
 
-export function ExportButton({ search, fromDate, toDate }: ExportButtonProps) {
+export function ExportButton({ search, fromDate, toDate, locale = "all" }: ExportButtonProps) {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -20,10 +23,11 @@ export function ExportButton({ search, fromDate, toDate }: ExportButtonProps) {
     startTransition(async () => {
       try {
         const filters =
-          fromDate || toDate
+          fromDate || toDate || locale !== "all"
             ? {
                 from: fromDate ? new Date(fromDate).toISOString() : undefined,
                 to: toDate ? new Date(`${toDate}T23:59:59`).toISOString() : undefined,
+                locale: locale !== "all" ? locale : undefined,
               }
             : undefined;
 

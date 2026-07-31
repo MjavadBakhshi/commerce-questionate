@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { SURVEY_LOCALE_LABELS } from "@/lib/survey";
 import {
   formatResponseDate,
   getFormattedResponseEntries,
@@ -31,7 +32,8 @@ export function ResponseDetail({ response, open, onOpenChange }: ResponseDetailP
         <DialogHeader>
           <DialogTitle>Survey Response</DialogTitle>
           <DialogDescription>
-            Submitted {formatResponseDate(response.created_at)} · ID {response.id}
+            Submitted {formatResponseDate(response.created_at)} ·{" "}
+            {SURVEY_LOCALE_LABELS[response.locale]} · ID {response.id}
           </DialogDescription>
         </DialogHeader>
 
