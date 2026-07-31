@@ -35,7 +35,7 @@ const english = surveyLocaleRegistry.en;
 const persian = surveyLocaleRegistry.fa;
 
 assert(english.ready, "English locale should be ready");
-assert(!persian.ready, "Persian locale should remain disabled until Phase 3 content is final");
+assert(persian.ready, "Persian locale should be ready after Phase 3");
 
 console.log("3/4 Checking question ID parity…");
 const englishIds = english.questions.map((question) => question.id).sort();
@@ -43,10 +43,18 @@ const persianIds = persian.questions.map((question) => question.id).sort();
 assertEqual(englishIds, [...SURVEY_QUESTION_IDS].sort(), "English IDs should match baseline");
 assertEqual(persianIds, englishIds, "Persian stub IDs should match English baseline");
 
-console.log("4/4 Checking draft keys and ready list…");
+console.log("4/5 Checking draft keys and ready list…");
 assertEqual(getSurveyDraftKey("en"), "questionate_survey_draft_en", "English draft key");
 assertEqual(getSurveyDraftKey("fa"), "questionate_survey_draft_fa", "Persian draft key");
-assertEqual(listReadySurveyLocales().map((locale) => locale.locale), ["en"], "Only English is ready");
+assertEqual(listReadySurveyLocales().map((locale) => locale.locale), ["en", "fa"], "English and Persian are ready");
+
+console.log("5/5 Checking Persian schema…");
+const faPayload = persian.createValidPayload();
+assert(persian.schema.safeParse(faPayload).success, "Persian valid payload should pass schema");
+assert(
+  !persian.questions.some((question) => question.label.includes("[FA]")),
+  "Persian questions should not contain placeholder labels",
+);
 
 console.log("\nLocale registry passed.");
 console.log(`  Registered: ${SUPPORTED_SURVEY_LOCALES.join(", ")}`);

@@ -207,7 +207,7 @@ Confirm in Supabase Table Editor: new submissions include `locale`.
 
 ---
 
-## Phase 3 — Persian content module
+## Phase 3 — Persian content module ✅ Complete
 
 **Purpose:** Add full Persian survey content as a separate module (not mixed with English).
 
@@ -251,7 +251,7 @@ Unit-style check (add to `scripts/test-phase3.ts`):
 
 ---
 
-## Phase 4 — Persian route + RTL layout
+## Phase 4 — Persian route + RTL layout ✅ Complete
 
 ### Steps
 

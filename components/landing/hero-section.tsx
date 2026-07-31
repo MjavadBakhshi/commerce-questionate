@@ -17,6 +17,7 @@ import {
   type SurveyLocale,
 } from "@/lib/survey";
 import { SURVEY_START_FRESH_EVENT } from "@/lib/survey-events";
+import { cn } from "@/lib/utils";
 import { clearSurveyDraft, hasSurveyDraft } from "@/utils/local-storage";
 
 interface HeroSectionProps {
@@ -60,7 +61,7 @@ export function HeroSection({ locale = DEFAULT_SURVEY_LOCALE }: HeroSectionProps
               {copy.hero.subtitle}
             </p>
             <p className="mt-3 max-w-xl text-sm text-muted-foreground">
-              Progress saves automatically. Refresh the page anytime — your answers will still be here.
+              {copy.hero.autosaveNote}
             </p>
 
             <div className="mt-10 flex w-full max-w-md flex-col items-stretch">
@@ -71,13 +72,13 @@ export function HeroSection({ locale = DEFAULT_SURVEY_LOCALE }: HeroSectionProps
                 onClick={scrollToSurvey}
               >
                 {draftExists ? copy.hero.continueCta : copy.hero.cta}
-                <ArrowRight className="size-4" />
+                <ArrowRight className="size-4 rtl:rotate-180" />
               </Button>
 
               {draftExists && (
                 <div className="mt-10 border-t border-border/60 pt-10">
                   <p className="mb-4 text-sm text-muted-foreground">
-                    Want to clear your saved answers and begin again?
+                    {copy.hero.startFreshPrompt}
                   </p>
                   <Button
                     type="button"
@@ -97,15 +98,21 @@ export function HeroSection({ locale = DEFAULT_SURVEY_LOCALE }: HeroSectionProps
           <div className="relative hidden min-h-[420px] bg-primary lg:block">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.18),_transparent_55%)]" />
             <div className="relative flex h-full flex-col justify-end p-10 text-primary-foreground">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-foreground/80">
-                Trusted research
-              </p>
-              <p className="mt-4 max-w-md text-3xl font-semibold leading-tight">
-                Your workflow insights shape the tools we build next.
+              {copy.hero.sidebar.tagline ? (
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-foreground/80">
+                  {copy.hero.sidebar.tagline}
+                </p>
+              ) : null}
+              <p
+                className={cn(
+                  "max-w-md text-3xl font-semibold leading-tight",
+                  copy.hero.sidebar.tagline ? "mt-4" : undefined,
+                )}
+              >
+                {copy.hero.sidebar.title}
               </p>
               <p className="mt-4 max-w-md text-base leading-relaxed text-primary-foreground/85">
-                We are talking to real shop owners — not guessing. Every answer helps us design software
-                that saves time, reduces mistakes, and makes selling online feel exciting again.
+                {copy.hero.sidebar.body}
               </p>
             </div>
           </div>
@@ -120,7 +127,7 @@ export function HeroSection({ locale = DEFAULT_SURVEY_LOCALE }: HeroSectionProps
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmFreshOpen(false)}>
-              Cancel
+              {copy.restore.cancel}
             </Button>
             <Button variant="destructive" onClick={handleStartFreshConfirmed}>
               {copy.restore.startFresh}

@@ -213,14 +213,10 @@ export const EN_QUESTIONS: SurveyQuestion[] = [
     options: [
       "Instagram",
       "WhatsApp",
-      "Google Sheets",
       "Excel",
-      "Shopify",
       "WooCommerce",
       "Etsy",
       "Amazon Seller",
-      "Trello",
-      "Notion",
       EN_OTHER_OPTION,
     ],
     hasOther: true,
@@ -328,7 +324,12 @@ export const EN_QUESTIONS: SurveyQuestion[] = [
     type: "radio",
     label:
       "How much would you be willing to pay each month for software that automates most of your daily work?",
-    options: ["Less than $10", "$10–30", "$30–75", "$75–150", "More than $150"],
+    options: [
+      "1–3 million Toman",
+      "3–5 million Toman",
+      "5–8 million Toman",
+      "More than 8 million Toman",
+    ],
   }),
   q({
     id: "qFinal",

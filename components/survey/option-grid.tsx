@@ -63,7 +63,7 @@ export function OptionGrid({
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => handleSelect(option)}
             className={cn(
-              "rounded-xl border-2 px-4 py-3.5 text-left text-sm font-medium transition-all duration-200",
+              "rounded-xl border-2 px-4 py-3.5 text-start text-sm font-medium transition-all duration-200",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
               isSelected
                 ? "border-primary bg-primary text-primary-foreground shadow-md"

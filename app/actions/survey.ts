@@ -13,22 +13,20 @@ export async function submitSurvey(
   answers: SurveyFormValues,
   locale = DEFAULT_SURVEY_LOCALE,
 ): Promise<SubmitSurveyResult> {
-  const { schema } = getSurveyLocaleConfig(locale);
+  const { schema, copy } = getSurveyLocaleConfig(locale);
   const parsed = schema.safeParse(answers);
 
   if (!parsed.success) {
     return {
       success: false,
-      error: "Invalid survey data. Please check your answers.",
+      error: copy.errors.invalidData,
     };
   }
 
   try {
     const { id } = await createSurveyResponse(parsed.data, locale);
     return { success: true, id };
-  } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Failed to save survey response.";
-    return { success: false, error: message };
+  } catch {
+    return { success: false, error: copy.errors.saveFailed };
   }
 }

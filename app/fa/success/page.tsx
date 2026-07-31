@@ -1,18 +1,18 @@
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import type { Metadata } from "next";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { DEFAULT_SURVEY_LOCALE, getSurveyLocaleConfig, getSurveyPath } from "@/lib/survey";
+import { getSurveyLocaleConfig, getSurveyPath } from "@/lib/survey";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Thank You | Online Store Owner Research Survey",
+  title: "متشکریم | پرسشنامه فروشگاه آنلاین",
   robots: { index: false, follow: false },
 };
 
-export default function SuccessPage() {
-  const { copy } = getSurveyLocaleConfig(DEFAULT_SURVEY_LOCALE);
+export default function PersianSuccessPage() {
+  const { copy } = getSurveyLocaleConfig("fa");
 
   return (
     <main className="flex min-h-screen flex-1 items-center justify-center bg-background px-4 py-20">
@@ -28,10 +28,10 @@ export default function SuccessPage() {
             {copy.success.description}
           </p>
           <Link
-            href={getSurveyPath(DEFAULT_SURVEY_LOCALE)}
+            href={getSurveyPath("fa")}
             className={cn(buttonVariants(), "mt-2 rounded-xl")}
           >
-            <ArrowLeft className="size-4" />
+            <ArrowRight className="size-4" />
             {copy.success.backLink}
           </Link>
         </CardContent>

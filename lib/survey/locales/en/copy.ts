@@ -12,9 +12,17 @@ export const EN_COPY: LocaleCopy = {
     title: "Help Us Build the Best Commerce Management Platform",
     subtitle:
       "This survey takes less than 5 minutes. Share your workflow and enter your exact Instagram username so we can reach you for early access.",
+    autosaveNote:
+      "Progress saves automatically. Refresh the page anytime — your answers will still be here.",
     cta: "Start Survey",
     continueCta: "Continue Survey",
     startFresh: "Start Fresh",
+    startFreshPrompt: "Want to clear your saved answers and begin again?",
+    sidebar: {
+      tagline: "Trusted research",
+      title: "Your workflow insights shape the tools we build next.",
+      body: "We are talking to real shop owners — not guessing. Every answer helps us design software that saves time, reduces mistakes, and makes selling online feel exciting again.",
+    },
   },
   success: {
     title: "Thank you for taking the time to complete our survey!",
@@ -27,6 +35,7 @@ export const EN_COPY: LocaleCopy = {
     description: "Would you like to continue your previous survey?",
     continue: "Continue",
     startFresh: "Start fresh",
+    cancel: "Cancel",
   },
   survey: {
     brandLabel: "Questionate",
@@ -40,6 +49,27 @@ export const EN_COPY: LocaleCopy = {
     submitLabel: "Submit Survey",
     submittingLabel: "Submitting…",
     incompleteHint: "Complete all required questions to submit.",
+    submitErrorTitle: "Submission failed",
+    otherFieldLabel: (otherOption) => `Tell us more about "${otherOption}"`,
+    otherFieldPlaceholder: "Please specify…",
+    finalQuestionPlaceholder:
+      "Describe the full journey from first contact to shipment…",
+    characterCount: (current, max, min) => {
+      const base = `${current.toLocaleString()} / ${max.toLocaleString()} maximum`;
+      return min !== undefined && current < min
+        ? `${base} (${min.toLocaleString()} minimum)`
+        : base;
+    },
+    progress: {
+      complete: (percentage) => `${percentage}% complete`,
+      questionOf: (current, total) => `Question ${current} of ${total}`,
+      ariaLabel: (percentage, current, total) =>
+        `Survey progress: ${percentage}% complete, question ${current} of ${total}`,
+    },
+  },
+  errors: {
+    invalidData: "Invalid survey data. Please check your answers.",
+    saveFailed: "Failed to save survey response. Please try again.",
   },
   validation: {
     selectOption: "Please select an option",

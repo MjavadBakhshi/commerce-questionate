@@ -23,6 +23,12 @@ function getQuestionOptions(question: SurveyQuestion | undefined): readonly stri
 }
 
 function buildDefaultValues(questions: SurveyQuestion[]): SurveyFormValues {
+  const q18 = questions.find((question) => question.id === "q18");
+  const q17 = questions.find((question) => question.id === "q17");
+  const q17YesValue = q18?.conditionalOn?.value;
+  const q17Default =
+    q17?.options?.find((option) => option !== q17YesValue) ?? "";
+
   const values: Record<string, string | string[] | undefined> = {
     respondentName: "",
   };
@@ -36,7 +42,7 @@ function buildDefaultValues(questions: SurveyQuestion[]): SurveyFormValues {
       continue;
     }
 
-    values[question.id] = question.id === "q17" ? "No" : "";
+    values[question.id] = question.id === "q17" ? q17Default : "";
 
     if (question.hasOther) {
       values[`${question.id}_other`] = "";
@@ -49,7 +55,7 @@ function buildDefaultValues(questions: SurveyQuestion[]): SurveyFormValues {
 function buildSampleFinalAnswer(locale: SurveyLocaleDefinition["locale"]): string {
   if (locale === "fa") {
     return (
-      "مشتری از طریق دایرکت اینستاگرام درباره یک هoodie آبی سایز M پرسید. موجودی را در فایل اکسل بررسی کردم، " +
+      "مشتری از طریق دایرکت اینستاگرام درباره یک هودی آبی سایز M پرسید. موجودی را در فایل اکسل بررسی کردم، " +
       "اطلاعات پرداخت را در واتساپ فرستادم، واریز بانکی را تایید کردم، سفارش را بسته‌بندی کردم و همان روز کد رهگیری را ارسال کردم. " +
       "در این فرایند چند بار بین اینستاگرام، واتساپ و Google Sheets جابه‌جا شدم و اطلاعات مشتری را دستی کپی کردم."
     );

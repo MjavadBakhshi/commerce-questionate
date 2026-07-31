@@ -1,32 +1,350 @@
-/**
- * Persian question content — structural stub for Phase 0.
- * Question IDs match English; labels/options will be translated in Phase 3.
- */
-import { EN_FINAL_SECTION, EN_QUESTIONS, EN_SECTIONS, OTHER_OPTION } from "@/lib/survey/locales/en/questions";
-import { replaceOtherOptionInQuestions } from "@/lib/survey/locale-utils";
 import { FA_OTHER_OPTION } from "@/lib/survey/locales/fa/copy";
-import type { SurveySection } from "@/types/survey";
+import type { SurveyQuestion, SurveySection } from "@/types/survey";
 
 export { FA_OTHER_OPTION as OTHER_OPTION };
 
-export const FA_SECTIONS: SurveySection[] = EN_SECTIONS.map((section) => ({
-  ...section,
-  title: `[FA] ${section.title}`,
-  description: `[FA] ${section.description}`,
-}));
+export const Q17_YES = "بله";
+export const Q17_NO = "خیر";
+
+export const FA_SECTIONS: SurveySection[] = [
+  {
+    id: "business-info",
+    number: 1,
+    title: "بخش ۱ — اطلاعات کسب‌وکار",
+    description: "لطفاً دربارهٔ کسب‌وکار خود و نحوهٔ فروش آنلاین اطلاعات دهید.",
+  },
+  {
+    id: "order-workflow",
+    number: 2,
+    title: "بخش ۲ — فرایند مدیریت سفارش",
+    description:
+      "لطفاً فرایند خود را از اولین تماس مشتری تا ارسال سفارش شرح دهید.",
+  },
+  {
+    id: "current-tools",
+    number: 3,
+    title: "بخش ۳ — ابزارهای فعلی",
+    description:
+      "لطفاً ابزارهایی را که روزانه استفاده می‌کنید و میزان جابه‌جایی بین آن‌ها را مشخص کنید.",
+  },
+  {
+    id: "challenges",
+    number: 4,
+    title: "بخش ۴ — بزرگ‌ترین چالش‌ها",
+    description:
+      "لطفاً کارهایی را که بیشترین زمان شما را می‌گیرد و نقاط اصطکاک را مشخص کنید.",
+  },
+  {
+    id: "software-budget",
+    number: 5,
+    title: "بخش ۵ — نرم‌افزار و بودجه",
+    description: "لطفاً نرم‌افزار فعلی و میزان سرمایه‌گذاری مورد نظر خود را بیان کنید.",
+  },
+];
 
 export const FA_FINAL_SECTION = {
-  ...EN_FINAL_SECTION,
-  title: `[FA] ${EN_FINAL_SECTION.title}`,
-  description: `[FA] ${EN_FINAL_SECTION.description}`,
+  id: "final",
+  title: "سؤال پایانی",
+  description:
+    "لطفاً یک سفارش اخیر را قدم‌به‌قدم شرح دهید تا جریان واقعی کار شما مشخص شود.",
 } as const;
 
-export const FA_QUESTIONS = replaceOtherOptionInQuestions(
-  EN_QUESTIONS.map((question) => ({
-    ...question,
-    label: `[FA] ${question.label}`,
-    description: question.description ? `[FA] ${question.description}` : undefined,
-  })),
-  OTHER_OPTION,
-  FA_OTHER_OPTION,
-);
+const q = (
+  question: Omit<SurveyQuestion, "required"> & { required?: boolean },
+): SurveyQuestion => ({ required: true, ...question });
+
+export const FA_QUESTIONS: SurveyQuestion[] = [
+  q({
+    id: "q1",
+    number: 1,
+    sectionId: "business-info",
+    type: "radio",
+    label: "چه نوع محصولاتی می‌فروشید؟",
+    options: [
+      "مد و پوشاک",
+      "کفش",
+      "زیبایی و آرایشی",
+      "الکترونیک",
+      "مواد غذایی و نوشیدنی",
+      "خانه و زندگی",
+      "اکسسوری",
+      FA_OTHER_OPTION,
+    ],
+    hasOther: true,
+  }),
+  q({
+    id: "q2",
+    number: 2,
+    sectionId: "business-info",
+    type: "radio",
+    label: "روزانه چند سفارش دریافت می‌کنید؟",
+    options: ["کمتر از ۵", "۵ تا ۲۰", "۲۰ تا ۵۰", "۵۰ تا ۱۰۰", "بیش از ۱۰۰"],
+  }),
+  q({
+    id: "q3",
+    number: 3,
+    sectionId: "business-info",
+    type: "radio",
+    label: "چند نفر کسب‌وکار شما را مدیریت می‌کنند؟",
+    options: ["تنها خودم", "دو نفر", "سه تا پنج نفر", "بیش از پنج نفر"],
+  }),
+  q({
+    id: "q4",
+    number: 4,
+    sectionId: "business-info",
+    type: "checkbox",
+    label: "در حال حاضر از کدام کانال‌های فروش استفاده می‌کنید؟",
+    options: [
+      "اینستاگرام",
+      "واتساپ",
+      "وب‌سایت",
+      "تلگرام",
+      "Digikala",
+      "بازار",
+      "ایتا / بله",
+      FA_OTHER_OPTION,
+    ],
+    hasOther: true,
+  }),
+  q({
+    id: "q5",
+    number: 5,
+    sectionId: "order-workflow",
+    type: "checkbox",
+    label: "بیشتر مشتریان اول از کجا با شما تماس می‌گیرند؟",
+    description: "لطفاً حداکثر ۲ گزینه انتخاب کنید.",
+    maxSelections: 2,
+    options: [
+      "دایرکت اینستاگرام",
+      "واتساپ",
+      "تلگرام",
+      "چت وب‌سایت",
+      "ایمیل",
+      "تماس تلفنی",
+      FA_OTHER_OPTION,
+    ],
+    hasOther: true,
+  }),
+  q({
+    id: "q6",
+    number: 6,
+    sectionId: "order-workflow",
+    type: "radio",
+    label: "بعد از اینکه مشتری تصمیم به خرید گرفت، اولین قدم شما چیست؟",
+    options: [
+      "بررسی موجودی",
+      "دریافت اطلاعات ارسال",
+      "ارسال دستورالعمل پرداخت",
+      "ثبت سفارش",
+      FA_OTHER_OPTION,
+    ],
+    hasOther: true,
+  }),
+  q({
+    id: "q7",
+    number: 7,
+    sectionId: "order-workflow",
+    type: "radio",
+    label: "سفارش‌های مشتری را کجا ثبت می‌کنید؟",
+    options: [
+      "ثبت نمی‌کنم",
+      "اکسل / Google Sheets",
+      "دفتر یادداشت",
+      "CRM",
+      "پلتفرم فروشگاهی",
+      "ERP",
+      FA_OTHER_OPTION,
+    ],
+    hasOther: true,
+  }),
+  q({
+    id: "q8",
+    number: 8,
+    sectionId: "order-workflow",
+    type: "radio",
+    label: "موجودی را چگونه مدیریت می‌کنید؟",
+    options: [
+      "بدون ثبت رسمی",
+      "فایل اکسل",
+      "نرم‌افزار انبار",
+      "وب‌سایت",
+      "ERP",
+      FA_OTHER_OPTION,
+    ],
+    hasOther: true,
+  }),
+  q({
+    id: "q9",
+    number: 9,
+    sectionId: "order-workflow",
+    type: "checkbox",
+    label: "پرداخت مشتری را چگونه تأیید می‌کنید؟",
+    description: "لطفاً حداکثر ۲ گزینه انتخاب کنید.",
+    maxSelections: 2,
+    options: [
+      "تأیید واریز کارت‌به‌کارت",
+      "درگاه پرداخت آنلاین",
+      "پرداخت در محل",
+      "کیف پول / اپ پرداخت",
+      "رسید بانکی",
+      FA_OTHER_OPTION,
+    ],
+    hasOther: true,
+  }),
+  q({
+    id: "q10",
+    number: 10,
+    sectionId: "order-workflow",
+    type: "checkbox",
+    label: "بعد از تأیید پرداخت چه کارهایی انجام می‌دهید؟",
+    description: "لطفاً حداکثر ۳ مرحله‌ای که معمولاً انجام می‌دهید را انتخاب کنید.",
+    maxSelections: 3,
+    options: [
+      "بسته‌بندی سفارش",
+      "چاپ فاکتور",
+      "صدور برچسب ارسال",
+      "ارسال کد رهگیری",
+      "به‌روزرسانی موجودی",
+      FA_OTHER_OPTION,
+    ],
+    hasOther: true,
+  }),
+  q({
+    id: "q11",
+    number: 11,
+    sectionId: "current-tools",
+    type: "checkbox",
+    label: "هر روز از کدام ابزارها استفاده می‌کنید؟",
+    options: [
+      "اینستاگرام",
+      "واتساپ",
+      "اکسل",
+      "WooCommerce",
+      "Digikala فروشنده",
+      "ترب",
+      FA_OTHER_OPTION,
+    ],
+    hasOther: true,
+  }),
+  q({
+    id: "q12",
+    number: 12,
+    sectionId: "current-tools",
+    type: "radio",
+    label: "تقریباً روزی چند بار بین برنامه‌های مختلف جابه‌جا می‌شوید؟",
+    options: ["کمتر از ۱۰", "۱۰ تا ۳۰", "۳۰ تا ۵۰", "بیش از ۵۰"],
+  }),
+  q({
+    id: "q13",
+    number: 13,
+    sectionId: "current-tools",
+    type: "radio",
+    label: "تقریباً روزی چند بار اطلاعات مشتری را کپی-پیست می‌کنید؟",
+    options: ["کمتر از ۵", "۵ تا ۱۰", "۱۰ تا ۲۰", "بیش از ۲۰"],
+  }),
+  q({
+    id: "q14",
+    number: 14,
+    sectionId: "challenges",
+    type: "checkbox",
+    label: "کدام کارها بیشترین وقت شما را می‌گیرد؟",
+    description: "لطفاً حداکثر ۳ مورد را که در هفته بیشترین زمان را می‌گیرند انتخاب کنید.",
+    maxSelections: 3,
+    options: [
+      "پاسخ به مشتریان",
+      "ثبت سفارش",
+      "مدیریت موجودی",
+      "تأیید پرداخت",
+      "ارسال",
+      "پشتیبانی مشتری",
+      "گزارش‌گیری",
+      "بازاریابی",
+      "تولید محتوا",
+      FA_OTHER_OPTION,
+    ],
+    hasOther: true,
+  }),
+  q({
+    id: "q15",
+    number: 15,
+    sectionId: "challenges",
+    type: "checkbox",
+    label: "در هفته گذشته با کدام مشکلات مواجه شدید؟",
+    options: [
+      "فروش بیش از موجودی",
+      "گم شدن سفارش",
+      "آدرس اشتباه",
+      "تأخیر در ارسال",
+      "پرداخت‌های جاافتاده",
+      "کندی پاسخ به مشتری",
+      "هیچ‌کدام",
+      FA_OTHER_OPTION,
+    ],
+    hasOther: true,
+  }),
+  q({
+    id: "q16",
+    number: 16,
+    sectionId: "challenges",
+    type: "radio",
+    label: "اگر بتوانید یک کار را کاملاً از روزمره‌تان حذف کنید، کدام است؟",
+    options: [
+      "پاسخ به پیام‌ها",
+      "ثبت سفارش",
+      "مدیریت موجودی",
+      "ارسال",
+      "تأیید پرداخت",
+      "گزارش‌گیری",
+      FA_OTHER_OPTION,
+    ],
+    hasOther: true,
+  }),
+  q({
+    id: "q17",
+    number: 17,
+    sectionId: "software-budget",
+    type: "radio",
+    label: "آیا در حال حاضر از نرم‌افزاری برای مدیریت کسب‌وکار استفاده می‌کنید؟",
+    options: [Q17_YES, Q17_NO],
+  }),
+  q({
+    id: "q18",
+    number: 18,
+    sectionId: "software-budget",
+    type: "textarea",
+    label: "اگر بله، از چه نرم‌افزاری استفاده می‌کنید؟",
+    conditionalOn: { questionId: "q17", value: Q17_YES },
+  }),
+  q({
+    id: "q19",
+    number: 19,
+    sectionId: "software-budget",
+    type: "textarea",
+    label: "بزرگ‌ترین ضعف نرم‌افزار فعلی شما چیست؟",
+  }),
+  q({
+    id: "q20",
+    number: 20,
+    sectionId: "software-budget",
+    type: "radio",
+    label:
+      "ماهانه چقدر حاضرید برای نرم‌افزاری که بیشتر کارهای روزانه شما را خودکار کند هزینه کنید؟",
+    options: [
+      "۱ تا ۳ میلیون تومان",
+      "۳ تا ۵ میلیون تومان",
+      "۵ تا ۸ میلیون تومان",
+      "بیش از ۸ میلیون تومان",
+    ],
+  }),
+  q({
+    id: "qFinal",
+    number: "final",
+    sectionId: "final",
+    type: "textarea",
+    label: "لطفاً آخرین سفارشی که از ابتدا تا انتها تکمیل کردید را توضیح دهید.",
+    description:
+      "از لحظه‌ای که مشتری با شما تماس گرفت تا زمانی که سفارش ارسال شد.",
+    minLength: 100,
+    maxLength: 1000,
+  }),
+];

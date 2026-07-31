@@ -10,9 +10,16 @@ export interface LocaleCopy {
     badge: string;
     title: string;
     subtitle: string;
+    autosaveNote: string;
     cta: string;
     continueCta: string;
     startFresh: string;
+    startFreshPrompt: string;
+    sidebar: {
+      tagline: string;
+      title: string;
+      body: string;
+    };
   };
   success: {
     title: string;
@@ -24,6 +31,7 @@ export interface LocaleCopy {
     description: string;
     continue: string;
     startFresh: string;
+    cancel: string;
   };
   survey: {
     brandLabel: string;
@@ -35,6 +43,20 @@ export interface LocaleCopy {
     submitLabel: string;
     submittingLabel: string;
     incompleteHint: string;
+    submitErrorTitle: string;
+    otherFieldLabel: (otherOption: string) => string;
+    otherFieldPlaceholder: string;
+    finalQuestionPlaceholder: string;
+    characterCount: (current: number, max: number, min?: number) => string;
+    progress: {
+      complete: (percentage: number) => string;
+      questionOf: (current: number, total: number) => string;
+      ariaLabel: (percentage: number, current: number, total: number) => string;
+    };
+  };
+  errors: {
+    invalidData: string;
+    saveFailed: string;
   };
   validation: {
     selectOption: string;

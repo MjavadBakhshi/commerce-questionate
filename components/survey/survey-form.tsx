@@ -177,6 +177,7 @@ export function SurveyForm({ locale = DEFAULT_SURVEY_LOCALE }: SurveyFormProps) 
                     errors={formState.errors}
                     values={values}
                     otherOptionLabel={config.otherOptionLabel}
+                    surveyCopy={copy.survey}
                   />
                 ) : null,
               )}
@@ -195,6 +196,7 @@ export function SurveyForm({ locale = DEFAULT_SURVEY_LOCALE }: SurveyFormProps) 
                 errors={formState.errors}
                 values={values}
                 otherOptionLabel={config.otherOptionLabel}
+                surveyCopy={copy.survey}
               />
             ))}
           </SurveySectionCard>
@@ -202,7 +204,7 @@ export function SurveyForm({ locale = DEFAULT_SURVEY_LOCALE }: SurveyFormProps) 
           {submitError && (
             <Alert variant="destructive">
               <AlertCircle />
-              <AlertTitle>Submission failed</AlertTitle>
+              <AlertTitle>{copy.survey.submitErrorTitle}</AlertTitle>
               <AlertDescription>{submitError}</AlertDescription>
             </Alert>
           )}
@@ -212,6 +214,7 @@ export function SurveyForm({ locale = DEFAULT_SURVEY_LOCALE }: SurveyFormProps) 
               percentage={progress.percentage}
               currentQuestion={progress.currentQuestion}
               totalQuestions={progress.totalQuestions}
+              labels={copy.survey.progress}
             />
 
             <div className="flex flex-col items-center gap-3">

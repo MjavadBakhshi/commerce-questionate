@@ -9,12 +9,15 @@ import { cn } from "@/lib/utils";
 import type { SurveyFormValues } from "@/types/survey";
 import type { SurveyQuestion } from "@/types/survey";
 
+import type { LocaleCopy } from "@/lib/survey/types";
+
 interface QuestionFieldProps {
   question: SurveyQuestion;
   control: Control<SurveyFormValues>;
   errors: FieldErrors<SurveyFormValues>;
   values: SurveyFormValues;
   otherOptionLabel: string;
+  surveyCopy: LocaleCopy["survey"];
 }
 
 function FieldError({ id, message }: { id: string; message?: string }) {
@@ -32,6 +35,7 @@ export function QuestionField({
   errors,
   values,
   otherOptionLabel,
+  surveyCopy,
 }: QuestionFieldProps) {
   const errorId = `${question.id}-error`;
   const fieldError = errors[question.id as keyof SurveyFormValues]?.message as
@@ -88,7 +92,8 @@ export function QuestionField({
                 control={control}
                 name={otherFieldId as keyof SurveyFormValues}
                 error={otherError}
-                label={`Tell us more about "${otherOptionLabel}"`}
+                label={surveyCopy.otherFieldLabel(otherOptionLabel)}
+                placeholder={surveyCopy.otherFieldPlaceholder}
               />
             )}
           </div>
@@ -135,11 +140,7 @@ export function QuestionField({
                       ? `${question.id}-counter`
                       : undefined
                 }
-                placeholder={
-                  isFinal
-                    ? "Describe the full journey from first contact to shipment…"
-                    : undefined
-                }
+                placeholder={isFinal ? surveyCopy.finalQuestionPlaceholder : undefined}
               />
               {isFinal && (
                 <p
@@ -153,9 +154,7 @@ export function QuestionField({
                         : "text-muted-foreground",
                   )}
                 >
-                  {charCount.toLocaleString()} / {maxLength?.toLocaleString()} maximum
-                  {charCount < minLength &&
-                    ` (${minLength.toLocaleString()} minimum)`}
+                  {surveyCopy.characterCount(charCount, maxLength ?? 0, minLength)}
                 </p>
               )}
             </>
@@ -172,11 +171,13 @@ function OtherTextarea({
   name,
   error,
   label,
+  placeholder,
 }: {
   control: Control<SurveyFormValues>;
   name: keyof SurveyFormValues;
   error?: string;
   label: string;
+  placeholder: string;
 }) {
   const errorId = `${String(name)}-error`;
 
@@ -197,7 +198,7 @@ function OtherTextarea({
             className="rounded-xl border-2 bg-card"
             aria-invalid={!!error}
             aria-describedby={error ? errorId : undefined}
-            placeholder="Please specify…"
+            placeholder={placeholder}
           />
         )}
       />
