@@ -14,12 +14,17 @@ Open **SQL Editor** in the Supabase dashboard and run:
 
 [`supabase/migrations/001_create_survey_responses.sql`](../supabase/migrations/001_create_survey_responses.sql)
 
+Then run the v2 locale migration:
+
+[`supabase/migrations/002_add_locale_to_survey_responses.sql`](../supabase/migrations/002_add_locale_to_survey_responses.sql)
+
 This creates the `survey_responses` table with:
 
 | Column       | Type        | Description                    |
 |--------------|-------------|--------------------------------|
 | `id`         | UUID        | Primary key                    |
 | `created_at` | TIMESTAMPTZ | Submission timestamp           |
+| `locale`     | TEXT        | Survey language (`en`, `fa`)   |
 | `answers`    | JSONB       | Full survey answers            |
 
 Row Level Security is enabled. There are **no public policies** — all reads and writes use the **service role key** from Next.js Server Actions only.

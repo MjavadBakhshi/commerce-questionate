@@ -152,7 +152,7 @@ English UI now reads from `getSurveyLocaleConfig("en")` via locale props and sha
 
 ---
 
-## Phase 2 — Database migration: `locale` column
+## Phase 2 — Database migration: `locale` column ✅ Complete
 
 ### Steps
 
@@ -193,6 +193,17 @@ npm run test:supabase
 ```
 
 Confirm in Supabase Table Editor: new submissions include `locale`.
+
+| Area | Status |
+|------|--------|
+| Migration `002_add_locale_to_survey_responses.sql` | ✅ |
+| `createSurveyResponse(answers, locale)` | ✅ |
+| Query/filter/count by locale | ✅ |
+| `submitSurvey` passes locale | ✅ |
+| CSV export includes `locale` column | ✅ |
+| `npm run test:supabase` updated | ✅ |
+
+**Before deploy:** run migration `002` in Supabase SQL Editor.
 
 ---
 

@@ -37,16 +37,16 @@ async function main() {
   if (!url) throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL in .env.local");
   if (!serviceKey) throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY in .env.local");
 
-  console.log("1/4 Connecting to Supabase…");
+  console.log("1/5 Connecting to Supabase…");
   const supabase = createClient(url, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  console.log("2/4 Inserting test row…");
+  console.log("2/5 Inserting test row with locale…");
   const { data: inserted, error: insertError } = await supabase
     .from("survey_responses")
-    .insert({ answers: TEST_ANSWERS })
-    .select("id, created_at")
+    .insert({ answers: TEST_ANSWERS, locale: "en" })
+    .select("id, created_at, locale")
     .single();
 
   if (insertError) {
@@ -54,13 +54,18 @@ async function main() {
     if (insertError.message.includes("survey_responses")) {
       console.error("\nHint: Run supabase/migrations/001_create_survey_responses.sql in the SQL Editor.");
     }
+    if (insertError.message.includes("locale")) {
+      console.error(
+        "\nHint: Run supabase/migrations/002_add_locale_to_survey_responses.sql in the SQL Editor.",
+      );
+    }
     process.exit(1);
   }
 
-  console.log("3/4 Reading test row back…");
+  console.log("3/5 Reading test row back…");
   const { data: fetched, error: fetchError } = await supabase
     .from("survey_responses")
-    .select("id, answers")
+    .select("id, locale, answers")
     .eq("id", inserted.id)
     .single();
 
@@ -69,11 +74,28 @@ async function main() {
     process.exit(1);
   }
 
-  console.log("4/4 Cleaning up test row…");
+  if (fetched.locale !== "en") {
+    console.error(`\nExpected locale "en", got "${fetched.locale ?? "null"}"`);
+    process.exit(1);
+  }
+
+  console.log("4/5 Filtering by locale…");
+  const { count, error: countError } = await supabase
+    .from("survey_responses")
+    .select("*", { count: "exact", head: true })
+    .eq("locale", "en");
+
+  if (countError || count === null) {
+    console.error("\nLocale filter failed:", countError?.message ?? "No count returned");
+    process.exit(1);
+  }
+
+  console.log("5/5 Cleaning up test row…");
   await supabase.from("survey_responses").delete().eq("id", inserted.id);
 
   console.log("\nPhase 2 passed.");
   console.log(`  Table: survey_responses`);
+  console.log(`  Locale column: working`);
   console.log(`  Test id: ${inserted.id}`);
   console.log(`  Service role key: working`);
 }

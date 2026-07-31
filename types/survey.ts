@@ -77,8 +77,7 @@ export type SurveyAnswers = Record<string, string | string[] | undefined>;
 export interface SurveyResponseRecord {
   id: string;
   created_at: string;
-  /** Present after v2 migration; defaults to `en` for legacy rows. */
-  locale?: SurveyLocale;
+  locale: SurveyLocale;
   answers: SurveyAnswers;
 }
 

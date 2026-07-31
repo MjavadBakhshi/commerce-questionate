@@ -22,7 +22,7 @@ function formatAnswerValue(value: unknown): string {
 function getCsvHeaders(locale: SurveyLocale = DEFAULT_SURVEY_LOCALE): string[] {
   const { questions } = getSurveyLocaleConfig(locale);
   const questionLabels = questions.map((question) => question.label);
-  return ["id", "created_at", "respondentName", ...questionLabels];
+  return ["id", "created_at", "locale", "respondentName", ...questionLabels];
 }
 
 /** Flatten survey responses to CSV rows */
@@ -37,11 +37,12 @@ export function responsesToCsv(
   }
 
   const rows = responses.map((response) => {
-    const responseLocale = response.locale ?? locale;
+    const responseLocale = response.locale;
     const { questions } = getSurveyLocaleConfig(responseLocale);
     const cells = [
       response.id,
       response.created_at,
+      response.locale,
       formatAnswerValue(response.answers.respondentName),
       ...questions.map((question) => formatAnswerValue(response.answers[question.id])),
     ];

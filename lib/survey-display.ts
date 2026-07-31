@@ -37,7 +37,7 @@ export function formatAnswerValue(value: unknown): string {
 /** Short preview string for the response list */
 export function getResponsePreview(response: SurveyResponseRecord): string {
   const { answers } = response;
-  const locale = response.locale ?? DEFAULT_SURVEY_LOCALE;
+  const locale = response.locale;
   const { otherOptionLabel } = getSurveyLocaleConfig(locale);
   const name =
     typeof answers.respondentName === "string" ? answers.respondentName : "Anonymous";

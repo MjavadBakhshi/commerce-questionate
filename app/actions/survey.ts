@@ -24,7 +24,7 @@ export async function submitSurvey(
   }
 
   try {
-    const { id } = await createSurveyResponse(parsed.data);
+    const { id } = await createSurveyResponse(parsed.data, locale);
     return { success: true, id };
   } catch (err) {
     const message =
