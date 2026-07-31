@@ -1,19 +1,27 @@
 import { useCallback, useEffect, useRef } from "react";
 import type { UseFormGetValues, UseFormWatch } from "react-hook-form";
+import { DEFAULT_SURVEY_LOCALE, type SurveyLocale } from "@/lib/survey";
 import { saveSurveyDraft } from "@/utils/local-storage";
-import type { SurveyFormValues } from "@/lib/survey-schema";
+import type { SurveyFormValues } from "@/types/survey";
 
 /** Auto-save form values to LocalStorage on every change */
 export function useSurveyAutosave(
   watch: UseFormWatch<SurveyFormValues>,
   getValues: UseFormGetValues<SurveyFormValues>,
+  locale: SurveyLocale = DEFAULT_SURVEY_LOCALE,
 ) {
-  const persist = useCallback((values: SurveyFormValues) => {
-    saveSurveyDraft({
-      answers: values,
-      savedAt: new Date().toISOString(),
-    });
-  }, []);
+  const persist = useCallback(
+    (values: SurveyFormValues) => {
+      saveSurveyDraft(
+        {
+          answers: values,
+          savedAt: new Date().toISOString(),
+        },
+        locale,
+      );
+    },
+    [locale],
+  );
 
   const persistRef = useRef(persist);
   persistRef.current = persist;

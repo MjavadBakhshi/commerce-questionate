@@ -1,3 +1,5 @@
+import { EN_COPY } from "@/lib/survey/locales/en/copy";
+
 /** Brand colors */
 export const COLORS = {
   primary: "#059669",
@@ -5,28 +7,32 @@ export const COLORS = {
   card: "#FFFFFF",
 } as const;
 
-/** Hero & landing copy */
+/**
+ * English landing copy.
+ * @deprecated Prefer `getSurveyLocaleConfig("en").copy` for new locale-aware UI.
+ */
 export const COPY = {
   hero: {
-    title: "Help Us Build the Best Commerce Management Platform",
-    subtitle:
-      "This survey takes less than 5 minutes. Share your workflow and enter your exact Instagram username so we can reach you for early access.",
-    cta: "Start Survey",
+    title: EN_COPY.hero.title,
+    subtitle: EN_COPY.hero.subtitle,
+    cta: EN_COPY.hero.cta,
   },
   success: {
-    title: "Thank you for taking the time to complete our survey!",
-    description:
-      "Your feedback has been recorded. If you shared your Instagram username, we'll contact you there when early access opens.",
+    title: EN_COPY.success.title,
+    description: EN_COPY.success.description,
   },
   restore: {
-    title: "Continue your survey?",
-    description: "Would you like to continue your previous survey?",
-    continue: "Continue",
-    startFresh: "Start fresh",
+    title: EN_COPY.restore.title,
+    description: EN_COPY.restore.description,
+    continue: EN_COPY.restore.continue,
+    startFresh: EN_COPY.restore.startFresh,
   },
 } as const;
 
-/** LocalStorage key for draft survey responses */
+/**
+ * @deprecated Use `getSurveyDraftKey(locale)` from `@/lib/survey`.
+ * Legacy single-locale draft key kept for English backward compatibility.
+ */
 export const SURVEY_DRAFT_KEY = "questionate_survey_draft";
 
 /** Admin session cookie name */

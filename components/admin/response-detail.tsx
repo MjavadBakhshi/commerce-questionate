@@ -23,7 +23,10 @@ interface ResponseDetailProps {
 export function ResponseDetail({ response, open, onOpenChange }: ResponseDetailProps) {
   if (!response) return null;
 
-  const entries = getFormattedResponseEntries(response.answers);
+  const entries = getFormattedResponseEntries(
+    response.answers,
+    response.locale ?? "en",
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

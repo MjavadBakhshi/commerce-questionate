@@ -1,4 +1,8 @@
-import { SURVEY_QUESTIONS } from "@/lib/survey-questions";
+import {
+  DEFAULT_SURVEY_LOCALE,
+  getSurveyLocaleConfig,
+  type SurveyLocale,
+} from "@/lib/survey";
 import { SURVEY_FIELD_IDS, type SurveyResponseRecord } from "@/types/survey";
 
 /** Escape a value for CSV output */
@@ -15,33 +19,37 @@ function formatAnswerValue(value: unknown): string {
   return String(value);
 }
 
-/** Column headers: metadata + one column per survey field */
-function getCsvHeaders(): string[] {
-  return ["id", "created_at", ...SURVEY_FIELD_IDS];
+function getCsvHeaders(locale: SurveyLocale = DEFAULT_SURVEY_LOCALE): string[] {
+  const { questions } = getSurveyLocaleConfig(locale);
+  const questionLabels = questions.map((question) => question.label);
+  return ["id", "created_at", "respondentName", ...questionLabels];
 }
 
 /** Flatten survey responses to CSV rows */
-export function responsesToCsv(responses: SurveyResponseRecord[]): string {
-  const headers = getCsvHeaders();
+export function responsesToCsv(
+  responses: SurveyResponseRecord[],
+  locale: SurveyLocale = DEFAULT_SURVEY_LOCALE,
+): string {
+  const headers = getCsvHeaders(locale);
 
   if (responses.length === 0) {
     return `${headers.join(",")}\n`;
   }
 
   const rows = responses.map((response) => {
+    const responseLocale = response.locale ?? locale;
+    const { questions } = getSurveyLocaleConfig(responseLocale);
     const cells = [
       response.id,
       response.created_at,
-      ...SURVEY_FIELD_IDS.map((fieldId) => {
-        const question = SURVEY_QUESTIONS.find((q) => q.id === fieldId);
-        if (question) {
-          return formatAnswerValue(response.answers[fieldId]);
-        }
-        return formatAnswerValue(response.answers[fieldId]);
-      }),
+      formatAnswerValue(response.answers.respondentName),
+      ...questions.map((question) => formatAnswerValue(response.answers[question.id])),
     ];
     return cells.map((cell) => escapeCsvValue(String(cell))).join(",");
   });
 
   return [headers.join(","), ...rows].join("\n");
 }
+
+/** @deprecated Use locale-aware headers via responsesToCsv(responses, locale) */
+export { SURVEY_FIELD_IDS };

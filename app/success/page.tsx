@@ -3,7 +3,7 @@ import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import type { Metadata } from "next";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { COPY } from "@/lib/constants";
+import { DEFAULT_SURVEY_LOCALE, getSurveyLocaleConfig } from "@/lib/survey";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -12,6 +12,8 @@ export const metadata: Metadata = {
 };
 
 export default function SuccessPage() {
+  const { copy } = getSurveyLocaleConfig(DEFAULT_SURVEY_LOCALE);
+
   return (
     <main className="flex min-h-screen flex-1 items-center justify-center bg-background px-4 py-20">
       <Card className="w-full max-w-lg animate-fade-in border-0 shadow-xl">
@@ -20,14 +22,14 @@ export default function SuccessPage() {
             <CheckCircle2 className="size-10 text-primary" aria-hidden />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            {COPY.success.title}
+            {copy.success.title}
           </h1>
           <p className="max-w-md leading-relaxed text-muted-foreground">
-            {COPY.success.description}
+            {copy.success.description}
           </p>
           <Link href="/" className={cn(buttonVariants(), "mt-2 rounded-xl")}>
             <ArrowLeft className="size-4" />
-            Back to home
+            {copy.success.backLink}
           </Link>
         </CardContent>
       </Card>

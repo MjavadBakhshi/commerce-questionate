@@ -11,24 +11,33 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { COPY } from "@/lib/constants";
+import {
+  DEFAULT_SURVEY_LOCALE,
+  getSurveyLocaleConfig,
+  type SurveyLocale,
+} from "@/lib/survey";
 import { SURVEY_START_FRESH_EVENT } from "@/lib/survey-events";
 import { clearSurveyDraft, hasSurveyDraft } from "@/utils/local-storage";
 
-export function HeroSection() {
+interface HeroSectionProps {
+  locale?: SurveyLocale;
+}
+
+export function HeroSection({ locale = DEFAULT_SURVEY_LOCALE }: HeroSectionProps) {
+  const { copy } = getSurveyLocaleConfig(locale);
   const [draftExists, setDraftExists] = useState(false);
   const [confirmFreshOpen, setConfirmFreshOpen] = useState(false);
 
   useEffect(() => {
-    setDraftExists(hasSurveyDraft());
-  }, []);
+    setDraftExists(hasSurveyDraft(locale));
+  }, [locale]);
 
   function scrollToSurvey() {
     document.getElementById("survey")?.scrollIntoView({ behavior: "smooth" });
   }
 
   function handleStartFreshConfirmed() {
-    clearSurveyDraft();
+    clearSurveyDraft(locale);
     window.dispatchEvent(new CustomEvent(SURVEY_START_FRESH_EVENT));
     setDraftExists(false);
     setConfirmFreshOpen(false);
@@ -42,13 +51,13 @@ export function HeroSection() {
           <div className="flex flex-col justify-center px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
             <div className="inline-flex w-fit items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
               <Store className="size-4" aria-hidden />
-              Built for online shop owners
+              {copy.hero.badge}
             </div>
             <h1 className="mt-6 text-4xl font-bold tracking-tight text-foreground sm:text-5xl sm:leading-tight">
-              {COPY.hero.title}
+              {copy.hero.title}
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              {COPY.hero.subtitle}
+              {copy.hero.subtitle}
             </p>
             <p className="mt-3 max-w-xl text-sm text-muted-foreground">
               Progress saves automatically. Refresh the page anytime — your answers will still be here.
@@ -61,7 +70,7 @@ export function HeroSection() {
                 className="rounded-xl px-8 text-base shadow-md"
                 onClick={scrollToSurvey}
               >
-                {draftExists ? "Continue Survey" : COPY.hero.cta}
+                {draftExists ? copy.hero.continueCta : copy.hero.cta}
                 <ArrowRight className="size-4" />
               </Button>
 
@@ -78,7 +87,7 @@ export function HeroSection() {
                     onClick={() => setConfirmFreshOpen(true)}
                   >
                     <RefreshCw className="size-4" />
-                    Start Fresh
+                    {copy.hero.startFresh}
                   </Button>
                 </div>
               )}
@@ -106,17 +115,15 @@ export function HeroSection() {
       <Dialog open={confirmFreshOpen} onOpenChange={setConfirmFreshOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Start a new survey?</DialogTitle>
-            <DialogDescription>
-              This will permanently delete your saved answers. You cannot undo this action.
-            </DialogDescription>
+            <DialogTitle>{copy.restore.title}</DialogTitle>
+            <DialogDescription>{copy.restore.description}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmFreshOpen(false)}>
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleStartFreshConfirmed}>
-              Yes, start fresh
+              {copy.restore.startFresh}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -15,26 +15,27 @@ import { QuestionField } from "@/components/survey/question-field";
 import { SurveySectionCard } from "@/components/survey/survey-section-card";
 import { useSurveyAutosave } from "@/hooks/use-survey-autosave";
 import { useSurveyProgress } from "@/hooks/use-survey-progress";
-import { SURVEY_START_FRESH_EVENT } from "@/lib/survey-events";
 import {
-  FINAL_QUESTION_SECTION,
+  DEFAULT_SURVEY_LOCALE,
   getQuestionsBySection,
+  getSurveyLocaleConfig,
   isQuestionVisible,
-  SURVEY_SECTIONS,
-} from "@/lib/survey-questions";
-import {
-  defaultSurveyValues,
-  surveyFormSchema,
-  type SurveyFormValues,
-} from "@/lib/survey-schema";
+  type SurveyLocale,
+} from "@/lib/survey";
+import { SURVEY_START_FRESH_EVENT } from "@/lib/survey-events";
+import type { SurveyFormValues } from "@/types/survey";
 import {
   clearSurveyDraft,
   getInitialSurveyValues,
   getRespondentNameFromUrl,
 } from "@/utils/local-storage";
 
-function buildInitialValues(): SurveyFormValues {
-  const saved = getInitialSurveyValues();
+interface SurveyFormProps {
+  locale?: SurveyLocale;
+}
+
+function buildInitialValues(locale: SurveyLocale): SurveyFormValues {
+  const saved = getInitialSurveyValues(locale);
   const urlName = getRespondentNameFromUrl();
 
   return {
@@ -43,53 +44,62 @@ function buildInitialValues(): SurveyFormValues {
   };
 }
 
-export function SurveyForm() {
+export function SurveyForm({ locale = DEFAULT_SURVEY_LOCALE }: SurveyFormProps) {
+  const config = getSurveyLocaleConfig(locale);
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
-  const initialValues = useMemo(() => buildInitialValues(), []);
+  const initialValues = useMemo(() => buildInitialValues(locale), [locale]);
 
   const form = useForm<SurveyFormValues>({
-    resolver: zodResolver(surveyFormSchema),
+    resolver: zodResolver(config.schema),
     defaultValues: initialValues,
     mode: "onChange",
   });
 
   const { control, handleSubmit, reset, setValue, watch, getValues, formState } = form;
   const values = watch();
-  const progress = useSurveyProgress(values);
+  const progress = useSurveyProgress(values, locale);
 
-  useSurveyAutosave(watch, getValues);
+  useSurveyAutosave(watch, getValues, locale);
+
+  const q18 = config.questions.find((question) => question.id === "q18");
+  const q17NoValue =
+    config.questions
+      .find((question) => question.id === "q17")
+      ?.options?.find((option) => option !== q18?.conditionalOn?.value) ?? "No";
 
   useEffect(() => {
     function handleStartFresh() {
-      clearSurveyDraft();
-      reset(defaultSurveyValues);
+      clearSurveyDraft(locale);
+      reset(config.defaultValues);
       setSubmitError(null);
     }
 
     window.addEventListener(SURVEY_START_FRESH_EVENT, handleStartFresh);
     return () => window.removeEventListener(SURVEY_START_FRESH_EVENT, handleStartFresh);
-  }, [reset]);
+  }, [config.defaultValues, locale, reset]);
 
   useEffect(() => {
-    if (values.q17 === "No") {
+    if (values.q17 === q17NoValue) {
       setValue("q18", "", { shouldValidate: true, shouldDirty: true });
     }
-  }, [values.q17, setValue]);
+  }, [q17NoValue, setValue, values.q17]);
 
   function onSubmit(data: SurveyFormValues) {
     setSubmitError(null);
     startTransition(async () => {
-      const result = await submitSurvey(data);
+      const result = await submitSurvey(data, locale);
       if (result.success) {
-        clearSurveyDraft();
-        router.push("/success");
+        clearSurveyDraft(locale);
+        router.push(locale === DEFAULT_SURVEY_LOCALE ? "/success" : `/${locale}/success`);
         return;
       }
       setSubmitError(result.error);
     });
   }
+
+  const { copy, sections, finalSection } = config;
 
   return (
     <div className="overflow-anchor-none">
@@ -100,12 +110,12 @@ export function SurveyForm() {
               <Sparkles className="size-5" aria-hidden />
             </div>
             <div>
-              <p className="text-sm font-medium text-primary">Questionate</p>
+              <p className="text-sm font-medium text-primary">{copy.survey.brandLabel}</p>
               <h2 className="mt-1 text-lg font-semibold tracking-tight sm:text-xl">
-                Help us understand your business workflow
+                {copy.survey.headerTitle}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Your answers auto-save as you go — refresh anytime and pick up where you left off.
+                {copy.survey.headerSubtitle}
               </p>
             </div>
           </div>
@@ -118,11 +128,10 @@ export function SurveyForm() {
         >
           <div className="rounded-xl border-2 border-primary/15 bg-accent/20 p-5">
             <Label htmlFor="respondentName" className="text-base font-semibold">
-              Your exact Instagram username
+              {copy.survey.instagramLabel}
             </Label>
             <p className="mt-1 mb-3 text-sm text-muted-foreground">
-              Enter your exact Instagram handle so we can contact you for future early access.
-              Do not include spaces — use the username exactly as it appears on Instagram.
+              {copy.survey.instagramHelper}
             </p>
             <Controller
               name="respondentName"
@@ -132,7 +141,7 @@ export function SurveyForm() {
                   <Input
                     {...field}
                     id="respondentName"
-                    placeholder="e.g. @sarasboutique"
+                    placeholder={copy.survey.instagramPlaceholder}
                     className="h-12 rounded-xl border-2 bg-card text-base"
                     aria-invalid={!!fieldState.error}
                     aria-describedby={
@@ -153,13 +162,13 @@ export function SurveyForm() {
             />
           </div>
 
-          {SURVEY_SECTIONS.map((section) => (
+          {sections.map((section) => (
             <SurveySectionCard
               key={section.id}
               title={section.title}
               description={section.description}
             >
-              {getQuestionsBySection(section.id).map((question) =>
+              {getQuestionsBySection(section.id, locale).map((question) =>
                 isQuestionVisible(question, values) ? (
                   <QuestionField
                     key={question.id}
@@ -167,6 +176,7 @@ export function SurveyForm() {
                     control={control}
                     errors={formState.errors}
                     values={values}
+                    otherOptionLabel={config.otherOptionLabel}
                   />
                 ) : null,
               )}
@@ -174,16 +184,17 @@ export function SurveyForm() {
           ))}
 
           <SurveySectionCard
-            title={FINAL_QUESTION_SECTION.title}
-            description={FINAL_QUESTION_SECTION.description}
+            title={finalSection.title}
+            description={finalSection.description}
           >
-            {getQuestionsBySection(FINAL_QUESTION_SECTION.id).map((question) => (
+            {getQuestionsBySection(finalSection.id, locale).map((question) => (
               <QuestionField
                 key={question.id}
                 question={question}
                 control={control}
                 errors={formState.errors}
                 values={values}
+                otherOptionLabel={config.otherOptionLabel}
               />
             ))}
           </SurveySectionCard>
@@ -213,15 +224,15 @@ export function SurveyForm() {
                 {isPending ? (
                   <>
                     <Loader2 className="size-4 animate-spin" />
-                    Submitting…
+                    {copy.survey.submittingLabel}
                   </>
                 ) : (
-                  "Submit Survey"
+                  copy.survey.submitLabel
                 )}
               </Button>
               {!formState.isValid && (
                 <p className="text-center text-sm text-muted-foreground">
-                  Complete all required questions to submit.
+                  {copy.survey.incompleteHint}
                 </p>
               )}
             </div>

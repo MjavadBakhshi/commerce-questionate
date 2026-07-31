@@ -1,8 +1,13 @@
-import { isQuestionVisible, SURVEY_QUESTIONS } from "@/lib/survey-questions";
+import {
+  DEFAULT_SURVEY_LOCALE,
+  getQuestionsBySection,
+  getSurveyLocaleConfig,
+  isQuestionVisible,
+  type SurveyLocale,
+} from "@/lib/survey";
 import { FINAL_QUESTION_MIN_LENGTH } from "@/lib/survey-events";
-import { surveyFormSchema } from "@/lib/survey-schema";
-import type { SurveyAnswers } from "@/types/survey";
-import { NUMBERED_QUESTION_COUNT, OTHER_OPTION } from "@/types/survey";
+import type { SurveyFormValues } from "@/types/survey";
+import { NUMBERED_QUESTION_COUNT } from "@/types/survey";
 
 interface SurveyProgress {
   percentage: number;
@@ -11,9 +16,9 @@ interface SurveyProgress {
 }
 
 function isAnswered(
-  questionId: string,
+  questionId: keyof SurveyFormValues,
   type: string,
-  values: SurveyAnswers,
+  values: SurveyFormValues,
 ): boolean {
   const value = values[questionId];
 
@@ -33,22 +38,26 @@ function isAnswered(
 }
 
 function isQuestionComplete(
-  values: SurveyAnswers,
-  question: (typeof SURVEY_QUESTIONS)[number],
+  values: SurveyFormValues,
+  question: ReturnType<typeof getSurveyLocaleConfig>["questions"][number],
+  otherOptionLabel: string,
 ): boolean {
   if (!isQuestionVisible(question, values)) return true;
 
-  if (!isAnswered(question.id, question.type, values)) return false;
+  if (!isAnswered(question.id as keyof SurveyFormValues, question.type, values)) {
+    return false;
+  }
 
   if (question.hasOther) {
-    const value = values[question.id];
+    const value = values[question.id as keyof SurveyFormValues];
     const needsOther =
       question.type === "radio"
-        ? value === OTHER_OPTION
-        : Array.isArray(value) && value.includes(OTHER_OPTION);
+        ? value === otherOptionLabel
+        : Array.isArray(value) && value.includes(otherOptionLabel);
 
     if (needsOther) {
-      const other = values[`${question.id}_other`];
+      const otherKey = `${question.id}_other` as keyof SurveyFormValues;
+      const other = values[otherKey];
       return typeof other === "string" && other.trim().length > 0;
     }
   }
@@ -57,18 +66,22 @@ function isQuestionComplete(
 }
 
 /** Calculate survey completion progress from current answers */
-export function useSurveyProgress(answers: SurveyAnswers): SurveyProgress {
-  const visibleQuestions = SURVEY_QUESTIONS.filter((q) =>
-    isQuestionVisible(q, answers),
+export function useSurveyProgress(
+  answers: SurveyFormValues,
+  locale: SurveyLocale = DEFAULT_SURVEY_LOCALE,
+): SurveyProgress {
+  const config = getSurveyLocaleConfig(locale);
+  const visibleQuestions = config.questions.filter((question) =>
+    isQuestionVisible(question, answers),
   );
-  const completed = visibleQuestions.filter((q) =>
-    isQuestionComplete(answers, q),
+  const completed = visibleQuestions.filter((question) =>
+    isQuestionComplete(answers, question, config.otherOptionLabel),
   ).length;
   const total = visibleQuestions.length;
   const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
 
   const firstIncomplete = visibleQuestions.find(
-    (q) => !isQuestionComplete(answers, q),
+    (question) => !isQuestionComplete(answers, question, config.otherOptionLabel),
   );
   const currentQuestion =
     firstIncomplete && typeof firstIncomplete.number === "number"
@@ -83,6 +96,10 @@ export function useSurveyProgress(answers: SurveyAnswers): SurveyProgress {
 }
 
 /** Check whether all visible answers pass Zod validation */
-export function isSurveyComplete(answers: SurveyAnswers): boolean {
-  return surveyFormSchema.safeParse(answers).success;
+export function isSurveyComplete(
+  answers: SurveyFormValues,
+  locale: SurveyLocale = DEFAULT_SURVEY_LOCALE,
+): boolean {
+  const { schema } = getSurveyLocaleConfig(locale);
+  return schema.safeParse(answers).success;
 }

@@ -1,4 +1,8 @@
-/** Shared option label for free-text follow-ups */
+import type { SurveyLocale, SurveyLocaleFilter } from "@/lib/survey/config";
+
+export type { SurveyLocale, SurveyLocaleFilter } from "@/lib/survey/config";
+
+/** Shared option label for free-text follow-ups (English default). */
 export const OTHER_OPTION = "Other";
 
 export type QuestionType = "radio" | "checkbox" | "textarea";
@@ -29,26 +33,65 @@ export interface SurveySection {
   description: string;
 }
 
+/** Shared form field keys across all survey locales. */
+export interface SurveyFormValues {
+  respondentName: string;
+  q1: string;
+  q1_other?: string;
+  q2: string;
+  q3: string;
+  q4: string[];
+  q4_other?: string;
+  q5: string[];
+  q5_other?: string;
+  q6: string;
+  q6_other?: string;
+  q7: string;
+  q7_other?: string;
+  q8: string;
+  q8_other?: string;
+  q9: string[];
+  q9_other?: string;
+  q10: string[];
+  q10_other?: string;
+  q11: string[];
+  q11_other?: string;
+  q12: string;
+  q13: string;
+  q14: string[];
+  q14_other?: string;
+  q15: string[];
+  q15_other?: string;
+  q16: string;
+  q16_other?: string;
+  q17: string;
+  q18?: string;
+  q19: string;
+  q20: string;
+  qFinal: string;
+}
+
 /** Stored answer payload — radio/textarea as string, checkbox as string[] */
 export type SurveyAnswers = Record<string, string | string[] | undefined>;
 
 export interface SurveyResponseRecord {
   id: string;
   created_at: string;
+  /** Present after v2 migration; defaults to `en` for legacy rows. */
+  locale?: SurveyLocale;
   answers: SurveyAnswers;
 }
 
 export interface SurveyDraft {
-  answers: SurveyAnswers;
+  answers: SurveyFormValues;
   savedAt: string;
 }
 
 export interface SurveyResponseFilters {
   from?: string;
   to?: string;
+  locale?: SurveyLocaleFilter;
 }
-
-export type { SurveyFormValues } from "@/lib/survey-schema";
 
 export const SURVEY_FIELD_IDS = [
   "respondentName",

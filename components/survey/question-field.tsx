@@ -4,17 +4,17 @@ import { Controller, type Control, type FieldErrors } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { OptionGrid } from "@/components/survey/option-grid";
-import { getOtherFieldId } from "@/lib/survey-questions";
+import { getOtherFieldId } from "@/lib/survey";
 import { cn } from "@/lib/utils";
-import type { SurveyFormValues } from "@/lib/survey-schema";
+import type { SurveyFormValues } from "@/types/survey";
 import type { SurveyQuestion } from "@/types/survey";
-import { OTHER_OPTION } from "@/types/survey";
 
 interface QuestionFieldProps {
   question: SurveyQuestion;
   control: Control<SurveyFormValues>;
   errors: FieldErrors<SurveyFormValues>;
   values: SurveyFormValues;
+  otherOptionLabel: string;
 }
 
 function FieldError({ id, message }: { id: string; message?: string }) {
@@ -31,6 +31,7 @@ export function QuestionField({
   control,
   errors,
   values,
+  otherOptionLabel,
 }: QuestionFieldProps) {
   const errorId = `${question.id}-error`;
   const fieldError = errors[question.id as keyof SurveyFormValues]?.message as
@@ -45,8 +46,8 @@ export function QuestionField({
   const showOther =
     question.hasOther &&
     (question.type === "radio"
-      ? currentValue === OTHER_OPTION
-      : Array.isArray(currentValue) && currentValue.includes(OTHER_OPTION));
+      ? currentValue === otherOptionLabel
+      : Array.isArray(currentValue) && currentValue.includes(otherOptionLabel));
 
   if (question.type === "radio" || question.type === "checkbox") {
     const mode = question.type === "radio" ? "single" : "multi";
@@ -87,7 +88,7 @@ export function QuestionField({
                 control={control}
                 name={otherFieldId as keyof SurveyFormValues}
                 error={otherError}
-                label={`Tell us more about "${OTHER_OPTION}"`}
+                label={`Tell us more about "${otherOptionLabel}"`}
               />
             )}
           </div>

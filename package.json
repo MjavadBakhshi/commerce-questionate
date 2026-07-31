@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test:supabase": "node scripts/test-supabase.mjs",
-    "test:phase3": "npx tsx scripts/test-phase3.ts"
+    "test:phase3": "npx tsx scripts/test-phase3.ts",
+    "test:locales": "npx tsx scripts/test-locale-registry.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

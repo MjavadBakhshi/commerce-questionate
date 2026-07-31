@@ -1,10 +1,19 @@
 import { FINAL_QUESTION_MIN_LENGTH } from "@/lib/survey-events";
-import { SURVEY_DRAFT_KEY } from "@/lib/constants";
+import {
+  DEFAULT_SURVEY_LOCALE,
+  getSurveyDraftKey,
+  LEGACY_SURVEY_DRAFT_KEY,
+  type SurveyLocale,
+} from "@/lib/survey";
 import type { SurveyDraft } from "@/types/survey";
 import { defaultSurveyValues, type SurveyFormValues } from "@/lib/survey-schema";
 
 function isBrowser(): boolean {
   return typeof window !== "undefined";
+}
+
+function getDraftStorageKey(locale: SurveyLocale = DEFAULT_SURVEY_LOCALE): string {
+  return getSurveyDraftKey(locale);
 }
 
 /** Merge a saved draft onto the canonical default form values */
@@ -38,15 +47,23 @@ export function mergeDraftWithDefaults(
   } as SurveyFormValues;
 }
 
-export function saveSurveyDraft(draft: SurveyDraft): void {
+export function saveSurveyDraft(
+  draft: SurveyDraft,
+  locale: SurveyLocale = DEFAULT_SURVEY_LOCALE,
+): void {
   if (!isBrowser()) return;
-  localStorage.setItem(SURVEY_DRAFT_KEY, JSON.stringify(draft));
+  localStorage.setItem(getDraftStorageKey(locale), JSON.stringify(draft));
 }
 
-export function loadSurveyDraft(): SurveyDraft | null {
+export function loadSurveyDraft(
+  locale: SurveyLocale = DEFAULT_SURVEY_LOCALE,
+): SurveyDraft | null {
   if (!isBrowser()) return null;
 
-  const raw = localStorage.getItem(SURVEY_DRAFT_KEY);
+  let raw = localStorage.getItem(getDraftStorageKey(locale));
+  if (!raw && locale === DEFAULT_SURVEY_LOCALE) {
+    raw = localStorage.getItem(LEGACY_SURVEY_DRAFT_KEY);
+  }
   if (!raw) return null;
 
   try {
@@ -56,13 +73,16 @@ export function loadSurveyDraft(): SurveyDraft | null {
   }
 }
 
-export function clearSurveyDraft(): void {
+export function clearSurveyDraft(locale: SurveyLocale = DEFAULT_SURVEY_LOCALE): void {
   if (!isBrowser()) return;
-  localStorage.removeItem(SURVEY_DRAFT_KEY);
+  localStorage.removeItem(getDraftStorageKey(locale));
+  if (locale === DEFAULT_SURVEY_LOCALE) {
+    localStorage.removeItem(LEGACY_SURVEY_DRAFT_KEY);
+  }
 }
 
-export function hasSurveyDraft(): boolean {
-  const draft = loadSurveyDraft();
+export function hasSurveyDraft(locale: SurveyLocale = DEFAULT_SURVEY_LOCALE): boolean {
+  const draft = loadSurveyDraft(locale);
   if (!draft?.answers) return false;
 
   return Object.entries(draft.answers).some(([key, value]) => {
@@ -73,8 +93,10 @@ export function hasSurveyDraft(): boolean {
   });
 }
 
-export function getInitialSurveyValues(): SurveyFormValues {
-  return mergeDraftWithDefaults(loadSurveyDraft());
+export function getInitialSurveyValues(
+  locale: SurveyLocale = DEFAULT_SURVEY_LOCALE,
+): SurveyFormValues {
+  return mergeDraftWithDefaults(loadSurveyDraft(locale));
 }
 
 /** Read Instagram username prefill params from the page URL */
